@@ -35,4 +35,4 @@ See ./demo.cpp for more ideas about how to use the BigInteger class.
 
 ## Author
 
-* **Jason Lai** - (jason99.lai@gmail.com)
+* **Jason Lai** - jason99.lai@gmail.com
