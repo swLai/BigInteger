@@ -39,7 +39,22 @@ int main()
         cout << "NoNoNo, (1) != (2) * quotient + remainder." << endl;
     cout << endl;
 
-    system("pause");
+    // Testing User's input data
+    BigInteger dividend, divisor;
+    cout << "Testing User's input data..." << endl;
+    cout << "Enter a dividend integer number: "; cin >> dividend;
+    cout << "Enter a divisor integer number: "; cin >> divisor;
+    quotient = dividend / divisor;
+    remainder = dividend % divisor;
+    cout  << "quotient = " << quotient << endl;
+    cout  << "remainder = " << remainder << endl;
+    if (dividend == (quotient * divisor + remainder))
 
+        cout << "The dividend is consistent with quotient * divisor + remainder" << endl;
+    else
+        cout << "The dividend is not consistent with quotient * divisor + remainder" << endl;
+	
+	system("pause");
+	
     return 0;
 }

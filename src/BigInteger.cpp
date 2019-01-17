@@ -333,8 +333,8 @@ static BigInteger multiply(const BigInteger &lhs, const BigInteger &rhs)
 
 static BigInteger divide(const BigInteger &rem_km1, const BigInteger &divisor, const BigInteger &quo_km1)
 {
-    static unsigned divisor_words_len = divisor.get_words_len();
-    static long long divisor_top = divisor_words_len > 1 ?
+    unsigned divisor_words_len = divisor.get_words_len();
+    long long divisor_top = divisor_words_len > 1 ?
                                           (long long)divisor.get_words(divisor_words_len - 1) * BASE + divisor.get_words(divisor_words_len - 2) :
                                           (long long)divisor.get_words(divisor_words_len - 1);
     unsigned rem_km1_words_len = rem_km1.get_words_len();
