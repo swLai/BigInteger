@@ -1,6 +1,6 @@
 # Big Integer Computation
 
-The class is aim at easy adoption for big integers computation with medium performance in c++ programming.
+The class is aimed at easy adoption for big integers computation with medium performance in c++ programming.
 
 ## Notification
 
