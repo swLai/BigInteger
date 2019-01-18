@@ -34,7 +34,11 @@ See ./demo.cpp for more ideas about how to use the BigInteger class.
 
 ## Performance
 
-<img src="./img/demo.png" height="400" width="340"></img>
+The following picture demonstrates the performance of using the BigInteger class to work with large arbitrary integer number:
+
+<img src="./img/demo.png" height="400" width="360" align="middle"></img>
+
+Note: The results are obtained from demo.cpp
 
 ## Author
 
