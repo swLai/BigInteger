@@ -32,6 +32,9 @@ int main(void) {
 
 See ./demo.cpp for more ideas about how to use the BigInteger class.
 
+## Performance
+
+<img src="./img/demo.png"></img>
 
 ## Author
 
