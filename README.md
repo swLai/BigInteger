@@ -36,9 +36,9 @@ See ./demo.cpp for more ideas about how to use the BigInteger class.
 
 The following picture demonstrates the performance of using the BigInteger class to work with large arbitrary integer number:
 
-<div style="text-align:center">
-  <img src="./img/demo.png" height="400" width="360" align="middle" />	
-</div>
+<p align="center">
+  <img src="./img/demo.png" height="400" width="360"  />	
+</p>
 
 Note: The results are obtained from demo.cpp
 
