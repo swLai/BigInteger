@@ -23,16 +23,14 @@ int main()
     cout << "Testing basic arithmetic computation... " << endl;
     cout << "-(1) + (2) = " << -bigint_1 + bigint_2 << endl;
     cout << "(1) * (2) = " << bigint_1 * bigint_2 << endl;
-    cout << "(1) / (2) = " << bigint_1 / bigint_2 << endl;
-    cout << "(1) % (2) = " << bigint_1 % bigint_2 << endl;
+    BigInteger quotient = bigint_1 / bigint_2;
+    cout << "(1) / (2) = " << quotient << endl;
+    BigInteger remainder = bigint_1 % bigint_2;
+    cout << "(1) % (2) = " << remainder << endl;
     cout << endl;
 
     // Verifying the consistence of the results
     cout << "Verifying the consistence of the results... " << endl;
-    cout << "Get the quotient of (1) / (2)" << endl;
-    BigInteger quotient = bigint_1 / bigint_2;
-    cout << "Get the remainder of (1) / (2)" << endl;
-    BigInteger remainder = bigint_1 % bigint_2;
     if (bigint_1 == (quotient * bigint_2 + remainder))
         cout << "Yes, (1) == (2) * quotient + remainder." << endl;
     else
@@ -49,11 +47,12 @@ int main()
     cout  << "quotient = " << quotient << endl;
     cout  << "remainder = " << remainder << endl;
     if (dividend == (quotient * divisor + remainder))
+
         cout << "The dividend is consistent with quotient * divisor + remainder" << endl;
     else
         cout << "The dividend is not consistent with quotient * divisor + remainder" << endl;
-	
-	system("pause");
-	
+
+    system("pause");
+
     return 0;
 }

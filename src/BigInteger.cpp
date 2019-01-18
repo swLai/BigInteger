@@ -213,24 +213,44 @@ istream& operator >> (istream &in, BigInteger &bi)
 */
 static BigInteger add(const BigInteger &lhs, const BigInteger &rhs)
 {
-    BigInteger result;
-    int result_words = lhs.get_words_len();
-    int rhs_words = rhs.get_words_len();
-    unsigned lhs_word, rhs_word;
+    BigInteger result = lhs;
+    unsigned result_words = result.get_words_len();
+    unsigned rhs_words = rhs.get_words_len();
     unsigned sub_result;
     unsigned carry = 0;
 
-    for (int i = 0; i < result_words; i++)
+    for (unsigned i = 0; i < result_words; i++)
     {
-        lhs_word = lhs.get_words(i) + carry;
-        rhs_word = i < rhs_words ? rhs.get_words(i) : 0;
+        if (i < rhs_words)
+        {
+            sub_result = result.get_words(i) + rhs.get_words(i) + carry;
+            carry = sub_result > SECTION_MAX ? 1 : 0;
+            sub_result %= BASE;
 
-        sub_result = lhs_word + rhs_word;
-        carry = sub_result > SECTION_MAX ? 1 : 0;
-        sub_result %= BASE;
+            result.set_word(sub_result, i);
+            result.set_zeros_ahead(find_zeros_ahead(sub_result), i);
+        }
+        else
+        {
+			while (carry && i < result_words)
+			{
+				sub_result = result.get_words(i) + carry;
 
-        result.set_word(sub_result, i);
-        result.set_zeros_ahead(find_zeros_ahead(sub_result), i);
+				if (sub_result > SECTION_MAX)
+                {
+                    result.set_word(0, i);
+                    result.set_zeros_ahead(8, i);
+                    carry = 1;
+                    i++;
+                }
+                else
+                {
+                    result.set_word(sub_result, i);
+                    result.set_zeros_ahead(find_zeros_ahead(sub_result), i);
+                    return result;
+                }
+			}
+        }
     }
 
     if (carry)
@@ -244,31 +264,55 @@ static BigInteger add(const BigInteger &lhs, const BigInteger &rhs)
 
 static BigInteger subtract(const BigInteger &lhs, const BigInteger &rhs)
 {
-    BigInteger result;
-    int result_words = lhs.get_words_len();
-    int rhs_words = rhs.get_words_len();
-    unsigned lhs_word, rhs_word;
+    BigInteger result = lhs;
+    unsigned result_words = result.get_words_len();
+    unsigned rhs_words = rhs.get_words_len(), rhs_word;
     int sub_result;
     unsigned carry = 0;
 
-    for (int i = 0; i < result_words; i++)
+    for (unsigned i = 0; i < result_words; i++)
     {
-        lhs_word = lhs.get_words(i) - carry;
-        rhs_word = i < rhs_words ? rhs.get_words(i) : 0;
-
-        if (lhs_word >= rhs_word)
+        if (i < rhs_words)
         {
-            sub_result = lhs_word - rhs_word;
-            carry = 0;
+            sub_result = result.get_words(i) - carry;
+            rhs_word = rhs.get_words(i);
+
+            if (sub_result >= rhs_word)
+            {
+                sub_result -= rhs_word;
+                carry = 0;
+            }
+            else
+            {
+                sub_result = (SECTION_MAX - rhs_word) + sub_result + 1;
+                carry = 1;
+            }
+
+            result.set_word(sub_result, i);
+            result.set_zeros_ahead(find_zeros_ahead(sub_result), i);
         }
         else
         {
-            sub_result = (SECTION_MAX - rhs_word) + lhs_word + 1;
-            carry = 1;
-        }
+            while (carry && i < result_words)
+            {
+                sub_result = result.get_words(i) - carry;
+                if (sub_result < 0)
+                {
+                    result.set_word(SECTION_MAX, i);
+                    result.set_zeros_ahead(0, i);
+                    carry = 1;
+                    i++;
+                }
+                else
+                {
+                    result.set_word(sub_result, i);
+                    result.set_zeros_ahead(find_zeros_ahead(sub_result), i);
+                    carry = 0;
+                }
+            }
 
-        result.set_word(sub_result, i);
-        result.set_zeros_ahead(find_zeros_ahead(sub_result), i);
+            break;
+        }
     }
 
     int i =  result_words-1;
@@ -301,13 +345,14 @@ static BigInteger rem_10(const BigInteger &bi, int pow, unsigned base = 10)
 
 static BigInteger multiply(const BigInteger &lhs, const BigInteger &rhs)
 {
+    BigInteger zero = ZERO;
     BigInteger a0, a1, b0, b1;
     BigInteger r, p, q;
 
    unsigned n = max(lhs.get_digits(), rhs.get_digits()), m;
 
-    if (lhs == ZERO || rhs == ZERO)
-        return ZERO;
+    if (lhs == zero || rhs == zero)
+        return zero;
     else if (n <= SECTION_LEN)
     {
         BigInteger result;
@@ -331,15 +376,12 @@ static BigInteger multiply(const BigInteger &lhs, const BigInteger &rhs)
     }
 }
 
-static BigInteger divide(const BigInteger &rem_km1, const BigInteger &divisor, const BigInteger &quo_km1)
+static BigInteger divide_recur(const BigInteger &rem_km1, const BigInteger &divisor, const BigInteger &quo_km1,
+                             const unsigned &divisor_words_len, const unsigned long long &divisor_leadings)
 {
-    unsigned divisor_words_len = divisor.get_words_len();
-    long long divisor_top = divisor_words_len > 1 ?
-                                          (long long)divisor.get_words(divisor_words_len - 1) * BASE + divisor.get_words(divisor_words_len - 2) :
-                                          (long long)divisor.get_words(divisor_words_len - 1);
     unsigned rem_km1_words_len = rem_km1.get_words_len();
     unsigned words_len_diff = rem_km1_words_len - divisor_words_len;
-    double head = (double)rem_km1.get_words(rem_km1_words_len - 1) / divisor_top * (divisor_words_len > 1 ? BASE : 1);
+    double head = (double)rem_km1.get_words(rem_km1_words_len - 1) / divisor_leadings  * (divisor_words_len > 1 ? BASE : 1);
 
     if (rem_km1 < divisor)
         return quo_km1;
@@ -365,7 +407,17 @@ static BigInteger divide(const BigInteger &rem_km1, const BigInteger &divisor, c
     if (rem_k < divisor)
         return quo_km1 + quo_k;
     else
-        return quo_km1 + divide(rem_k, divisor, quo_k);
+        return quo_km1 + divide_recur(rem_k, divisor, quo_k, divisor_words_len, divisor_leadings);//divide(rem_k, divisor, quo_k);
+}
+
+static BigInteger divide(const BigInteger &dividend, const BigInteger &divisor, const BigInteger &zero)
+{
+    unsigned divisor_words_len = divisor.get_words_len();
+    unsigned long long divisor_leadings = divisor_words_len > 1 ?
+        (unsigned long long)divisor.get_words(divisor_words_len - 1) * BASE + divisor.get_words(divisor_words_len - 2) :
+        (unsigned long long)divisor.get_words(divisor_words_len - 1);
+
+    return divide_recur(dividend, divisor, zero, divisor_words_len, divisor_leadings);
 }
 
 BigInteger BigInteger::operator -() const
