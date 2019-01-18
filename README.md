@@ -34,7 +34,7 @@ See ./demo.cpp for more ideas about how to use the BigInteger class.
 
 ## Performance
 
-<img src="./img/demo.png" height="200" width="100"></img>
+<img src="./img/demo.png" height="400" width="290"></img>
 
 ## Author
 
