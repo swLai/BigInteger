@@ -19,14 +19,14 @@ Place the ./src and ./include documents inside your project directory and includ
 
 using namespace std;
 
-int main(void) {
-
-	BigInteger bigint_1("+12345678987654321");
-	BigInteger bigint_2("-98765432123456789");
-
-	cout << "bigint_1 - bigint_2 = " << bigint_1 - bigint_2 << endl;
-	
-	return 0;
+int main(void)
+{
+    BigInteger bigint_1("+12345678987654321");
+    BigInteger bigint_2("-98765432123456789");
+    
+    cout << "bigint_1 - bigint_2 = " << bigint_1 - bigint_2 << endl;
+    
+    return 0;
 }
 ```
 
