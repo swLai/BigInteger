@@ -369,9 +369,9 @@ static BigInteger multiply_karatsuba(const BigInteger &lhs, const BigInteger &rh
         m  = floor(n / 2);
         a1 = shift_10(lhs, -m); a0 = rem_10(lhs, m);
         b1 = shift_10(rhs, -m); b0 = rem_10(rhs, m);
-        r = multiply(a1 + a0, b1 + b0);
-        p = multiply(a1, b1);
-        q = multiply(a0, b0);
+        r = multiply_karatsuba(a1 + a0, b1 + b0);
+        p = multiply_karatsuba(a1, b1);
+        q = multiply_karatsuba(a0, b0);
         return shift_10(p, 2*m) + shift_10(r - p - q, m) + q;
     }
 }
