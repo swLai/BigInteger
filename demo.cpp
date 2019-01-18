@@ -49,7 +49,6 @@ int main()
     cout  << "quotient = " << quotient << endl;
     cout  << "remainder = " << remainder << endl;
     if (dividend == (quotient * divisor + remainder))
-
         cout << "The dividend is consistent with quotient * divisor + remainder" << endl;
     else
         cout << "The dividend is not consistent with quotient * divisor + remainder" << endl;
