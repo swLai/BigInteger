@@ -114,6 +114,7 @@ BigInteger::BigInteger(const BigInteger &bi, int pow, unsigned base)
 
             if (pow >= 0)
             {
+                // need modifying for the sake of speeding up the shifting process
                 string zeros_str;
                 for (unsigned i = 0; i < pow; i++)
                     zeros_str += ZERO_1_APX;
