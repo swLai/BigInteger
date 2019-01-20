@@ -343,7 +343,7 @@ static BigInteger rem_10(const BigInteger &bi, int pow, unsigned base = 10)
     return bi - q_10_pPow;
 }
 
-static BigInteger multiply(const BigInteger &lhs, const BigInteger &rhs)
+static BigInteger multiply_karatsuba(const BigInteger &lhs, const BigInteger &rhs)
 {
     BigInteger zero = ZERO;
     BigInteger a0, a1, b0, b1;
@@ -369,9 +369,9 @@ static BigInteger multiply(const BigInteger &lhs, const BigInteger &rhs)
         m  = floor(n / 2);
         a1 = shift_10(lhs, -m); a0 = rem_10(lhs, m);
         b1 = shift_10(rhs, -m); b0 = rem_10(rhs, m);
-        r = multiply(a1 + a0, b1 + b0);
-        p = multiply(a1, b1);
-        q = multiply(a0, b0);
+        r = multiply_karatsuba(a1 + a0, b1 + b0);
+        p = multiply_karatsuba(a1, b1);
+        q = multiply_karatsuba(a0, b0);
         return shift_10(p, 2*m) + shift_10(r - p - q, m) + q;
     }
 }
@@ -465,7 +465,10 @@ BigInteger operator * (BigInteger lhs, const BigInteger &rhs)
     if (rhs == one) return lhs;
     if (rhs == min_one) return -lhs;
 
-    return BigInteger(multiply(lhs, rhs), lhs.is_neg() ^ rhs.is_neg());
+    return BigInteger(
+        multiply_karatsuba(lhs, rhs), // may adopt other faster multiplying methods 
+	lhs.is_neg() ^ rhs.is_neg()
+    );
 }
 
 BigInteger operator / (BigInteger lhs, const BigInteger &rhs)
