@@ -379,12 +379,12 @@ static BigInteger multiply(const BigInteger &lhs, const BigInteger &rhs)
 static BigInteger divide_recur(const BigInteger &rem_km1, const BigInteger &divisor, const BigInteger &quo_km1,
                              const unsigned &divisor_words_len, const unsigned long long &divisor_leadings)
 {
+    if (rem_km1 < divisor)
+        return quo_km1;
+
     unsigned rem_km1_words_len = rem_km1.get_words_len();
     unsigned words_len_diff = rem_km1_words_len - divisor_words_len;
     double head = (double)rem_km1.get_words(rem_km1_words_len - 1) / divisor_leadings  * (divisor_words_len > 1 ? BASE : 1);
-
-    if (rem_km1 < divisor)
-        return quo_km1;
 
     if (head < 1)
     {
