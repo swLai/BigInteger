@@ -232,7 +232,7 @@ static BigInteger add(const BigInteger &lhs, const BigInteger &rhs)
         }
         else
         {
-			while (carry && i < result_words)
+            while (carry && i < result_words)
 			{
 				sub_result = result.get_words(i) + carry;
 
@@ -466,8 +466,8 @@ BigInteger operator * (BigInteger lhs, const BigInteger &rhs)
     if (rhs == min_one) return -lhs;
 
     return BigInteger(
-        multiply_karatsuba(lhs, rhs), // may adopt other faster multiplying methods 
-	lhs.is_neg() ^ rhs.is_neg()
+        multiply_karatsuba(lhs, rhs), // may adopt other faster multiplying methods
+        lhs.is_neg() ^ rhs.is_neg()
     );
 }
 
