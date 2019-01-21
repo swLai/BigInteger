@@ -7,6 +7,13 @@
 #include "../include/utility.h"
 
 #define ZERO_9_APX             "000000000"
+#define ZERO_8_APX             "00000000"
+#define ZERO_7_APX             "0000000"
+#define ZERO_6_APX             "000000"
+#define ZERO_5_APX             "00000"
+#define ZERO_4_APX             "0000"
+#define ZERO_3_APX             "000"
+#define ZERO_2_APX             "00"
 #define ZERO_1_APX             "0"
 
 #ifndef ZERO
@@ -109,25 +116,58 @@ BigInteger::BigInteger(const BigInteger &bi, int pow, unsigned base)
         if (base == 10)
         {
             stringstream ss;
-            string  shifted_str, feagure_str;
+            string  shifted_feagure_str, feagure_str;
             ss << bi; ss >> feagure_str;
 
             if (pow >= 0)
             {
-                // need modifying for the sake of speeding up the shifting process
                 string zeros_str;
-                for (unsigned i = 0; i < pow; i++)
+                unsigned shift_sections = pow / SECTION_LEN;
+                unsigned shift_remaining_digits = pow % SECTION_LEN;
+
+                while(shift_sections--)
+                    zeros_str += ZERO_9_APX;
+
+                switch (shift_remaining_digits)
+                {
+                case 5:
+                    zeros_str += ZERO_5_APX;
+                    break;
+                case 4:
+                    zeros_str += ZERO_4_APX;
+                    break;
+                case 8:
+                    zeros_str += ZERO_8_APX;
+                    break;
+                case 1:
                     zeros_str += ZERO_1_APX;
-                shifted_str = feagure_str + zeros_str;
+                    break;
+                case 7:
+                    zeros_str += ZERO_7_APX;
+                    break;
+                case 2:
+                    zeros_str += ZERO_2_APX;
+                    break;
+                case 6:
+                    zeros_str += ZERO_6_APX;
+                    break;
+                case 3:
+                    zeros_str += ZERO_3_APX;
+                    break;
+                default:
+                    break;
+                }
+                shifted_feagure_str = feagure_str + zeros_str;
             }
             else
             {
-                if (feagure_str.size() + pow > 0)
-                    shifted_str = feagure_str.substr(0, feagure_str.size() + pow);
+                int shift_digits =  feagure_str.size() + pow;
+                if (shift_digits > 0)
+                    shifted_feagure_str = feagure_str.substr(0, shift_digits);
                 else
-                    shifted_str = ZERO_1_APX;
+                    shifted_feagure_str = ZERO_1_APX;
             }
-            *this = BigInteger(BigInteger(shifted_str), bi.is_neg());
+            *this = BigInteger(BigInteger(shifted_feagure_str), bi.is_neg());
         }
     }
 }
@@ -181,9 +221,9 @@ void BigInteger::print(ostream &out) const
     if (is_neg())
         out << "-";
 
+    string zeros_str;
     int words = get_words_len();
     unsigned zeros;
-    string zeros_str;
     out << get_words(words - 1);
     for (int pos = words - 2; pos > -1; pos--)
     {
@@ -233,7 +273,7 @@ static BigInteger add(const BigInteger &lhs, const BigInteger &rhs)
         }
         else
         {
-            while (carry && i < result_words)
+			while (carry && i < result_words)
 			{
 				sub_result = result.get_words(i) + carry;
 
@@ -327,20 +367,22 @@ static BigInteger subtract(const BigInteger &lhs, const BigInteger &rhs)
     return result;
 }
 
-static BigInteger shift_10(const BigInteger &bi, int pow, unsigned base = 10)
+static BigInteger shift_10r2p(const BigInteger &bi, int pow, unsigned base = 10)
 {
     if ((int)bi.get_digits() <= -pow)
         return ZERO;
     return BigInteger(bi, pow, base);
 }
 
-static BigInteger rem_10(const BigInteger &bi, int pow, unsigned base = 10)
+static BigInteger rem_10r2p(const BigInteger &bi, int pow, unsigned base = 10)
 {
-    if (bi.get_digits() <= abs(pow))
+    unsigned pow_abs = abs(pow);
+
+    if (bi.get_digits() <= pow_abs)
         return bi;
 
-    BigInteger q_10_nPow = shift_10(bi, -abs(pow), base);
-    BigInteger q_10_pPow = shift_10(q_10_nPow, abs(pow), base);
+    BigInteger q_10_nPow = shift_10r2p(bi, -pow_abs, base);
+    BigInteger q_10_pPow = shift_10r2p(q_10_nPow, pow_abs, base);
     return bi - q_10_pPow;
 }
 
@@ -368,21 +410,18 @@ static BigInteger multiply_karatsuba(const BigInteger &lhs, const BigInteger &rh
     else
     {
         m  = floor(n / 2);
-        a1 = shift_10(lhs, -m); a0 = rem_10(lhs, m);
-        b1 = shift_10(rhs, -m); b0 = rem_10(rhs, m);
+        a1 = shift_10r2p(lhs, -m); a0 = rem_10r2p(lhs, m);
+        b1 = shift_10r2p(rhs, -m); b0 = rem_10r2p(rhs, m);
         r = multiply_karatsuba(a1 + a0, b1 + b0);
         p = multiply_karatsuba(a1, b1);
         q = multiply_karatsuba(a0, b0);
-        return shift_10(p, 2*m) + shift_10(r - p - q, m) + q;
+        return shift_10r2p(p, 2*m) + shift_10r2p(r - p - q, m) + q;
     }
 }
 
 static BigInteger divide_recur(const BigInteger &rem_km1, const BigInteger &divisor, const BigInteger &quo_km1,
                              const unsigned &divisor_words_len, const unsigned long long &divisor_leadings)
 {
-    if (rem_km1 < divisor)
-        return quo_km1;
-
     unsigned rem_km1_words_len = rem_km1.get_words_len();
     unsigned words_len_diff = rem_km1_words_len - divisor_words_len;
     double head = (double)rem_km1.get_words(rem_km1_words_len - 1) / divisor_leadings  * (divisor_words_len > 1 ? BASE : 1);
@@ -486,7 +525,10 @@ BigInteger operator / (BigInteger lhs, const BigInteger &rhs)
     if (rhs == one) return lhs;
     if (rhs == min_one) return -lhs;
 
-    return BigInteger(divide(lhs, rhs, zero), lhs.is_neg() ^ rhs.is_neg());
+    return BigInteger(
+        divide(lhs, rhs, zero),
+        lhs.is_neg() ^ rhs.is_neg()
+    );
 }
 
 BigInteger operator % (BigInteger lhs, const BigInteger &rhs)
