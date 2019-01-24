@@ -1,10 +1,6 @@
 #ifndef PAIR_H
 #define PAIR_H
 
-#ifdef DEBUG
-#include <iostream>
-#endif
-
 #include <vector>
 
 using namespace std;
@@ -40,20 +36,10 @@ class Pair
             }
         }
 
-        unsigned* get_sequence(void)
-        {
-#ifdef DEBUG
-            for (unsigned i = 0; i < sizeof(this->seq); i++)
-                cout << this->seq[i] << ' ';
-            cout << endl << endl;
-#endif // DEBUG
-            return this->seq;
-        }
-
         template <class T>
         void tidy_that(vector<T> &x)
         {
-            vector<T> x_tmp(x);
+            auto x_tmp(x);
             unsigned n = x.size();
             for (unsigned i = 0; i < n; i++)
                 x[i] = x_tmp[this->seq[i]];
