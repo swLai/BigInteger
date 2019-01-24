@@ -30,7 +30,6 @@ class Pair {
 #endif // DEBUG
 
             seq = new unsigned [N];
-
             for (unsigned i = 0; i < S; i++)
             {
                 unsigned tmp = 2 * i;
@@ -55,7 +54,6 @@ class Pair {
                 cout << this->seq[i] << ' ';
             cout << endl << endl;
 #endif // DEBUG
-
             return this->seq;
         }
 };
