@@ -43,7 +43,7 @@ class Pair {
                 seq[pos] = val;
                 seq[pos + 1]= val + D;
                 seq[pos_shift] = val + 1;
-                seq[pos_shift + 1] = seq[pos + 1] + 1;
+                seq[pos_shift + 1] = val + 1 + D;
             }
         }
         unsigned* get_sequence(void)
