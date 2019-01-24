@@ -11,8 +11,8 @@ using namespace std;
 class Pair {
 
     private:
-        unsigned *seq;
-		
+        unsigned* seq;
+
     public:
         Pair(unsigned N)
         {
@@ -28,6 +28,7 @@ class Pair {
 #endif // DEBUG
 
             seq = new unsigned [N];
+
             for (unsigned i = 0; i < S; i++)
             {
                 unsigned tmp = 2 * i;
@@ -42,16 +43,17 @@ class Pair {
                 seq[pos] = val;
                 seq[pos + 1]= val + D;
                 seq[pos_shift] = val + 1;
-                seq[pos_shift + 1] = val + 1 + D;
+                seq[pos_shift + 1] = seq[pos + 1] + 1;
             }
         }
-        unsigned * get_sequence(void)
+        unsigned* get_sequence(void)
         {
 #ifdef DEBUG
             for (unsigned i = 0; i < this->D << 1; i++)
                 cout << this->seq[i] << ' ';
             cout << endl << endl;
 #endif // DEBUG
+
             return this->seq;
         }
 };
