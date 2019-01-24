@@ -1,6 +1,8 @@
 #ifndef DEFINE_H
 #define DEFINE_H
 
+#define DEBUG
+
 #define SECTION_LEN            9
 #define SECTION_MAX           999999999
 #define SECTION_MASK         0x3FFFFFFF

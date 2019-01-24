@@ -1,8 +1,6 @@
 #ifndef PAIR_H
 #define PAIR_H
 
-
-#define DEBUG
 #ifdef DEBUG
 #include <iostream>
 using namespace std;
