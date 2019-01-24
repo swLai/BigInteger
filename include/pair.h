@@ -1,10 +1,6 @@
 #ifndef PAIR_H
 #define PAIR_H
 
-#include <vector>
-
-using namespace std;
-
 class Pair
 {
     private:
@@ -37,7 +33,7 @@ class Pair
         }
 
         template <class T>
-        void tidy_that(vector<T> &x)
+        void tidy_that(std::vector<T> &x)
         {
             auto x_tmp(x);
             unsigned n = x.size();
