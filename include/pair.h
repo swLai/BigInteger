@@ -18,15 +18,7 @@ class Pair
             unsigned L = D >> 1;
             unsigned S = L >> 1;
 
-#ifdef DEBUG
-            cout << "D=" << D;
-            cout << ", L=" << L;
-            cout << ", S=" << S << endl;
-            cout << endl;
-#endif // DEBUG
-
             seq = new unsigned [N];
-
             for (unsigned i = 0; i < S; i++)
             {
                 unsigned tmp = 2 * i;
@@ -34,7 +26,7 @@ class Pair
                 seq[tmp + L] = tmp + 1;
             }
 
-            for (unsigned i = 0, k = 0; i < L; ++i, k+=2)
+            for (unsigned i = 0; i < L; i++)
             {
                 unsigned pos = i << 1, pos_shift = pos + D;
                 unsigned  val = seq[pos] << 1;
