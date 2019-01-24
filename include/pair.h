@@ -18,28 +18,28 @@ class Pair
             unsigned L = D >> 1;
             unsigned S = L >> 1;
 
-            seq = new unsigned [N];
+            this->seq = new unsigned [N];
             for (unsigned i = 0; i < S; i++)
             {
-                unsigned tmp = 2 * i;
-                seq[tmp] = tmp;
-                seq[tmp + L] = tmp + 1;
+                unsigned tmp = i << 1;
+                this->seq[tmp] = tmp;
+                this->seq[tmp + L] = tmp + 1;
             }
 
             for (unsigned i = 0; i < L; i++)
             {
                 unsigned pos = i << 1, pos_shift = pos + D;
-                unsigned  val = seq[pos] << 1;
-                seq[pos] = val;
-                seq[pos + 1]= val + D;
-                seq[pos_shift] = val + 1;
-                seq[pos_shift + 1] = val + 1 + D;
+                unsigned  val = this->seq[pos] << 1;
+                this->seq[pos] = val;
+                this->seq[pos + 1]= val + D;
+                this->seq[pos_shift] = val + 1;
+                this->seq[pos_shift + 1] = val + 1 + D;
             }
         }
         unsigned* get_sequence(void)
         {
 #ifdef DEBUG
-            for (unsigned i = 0; i < sizeof(seq); i++)
+            for (unsigned i = 0; i < sizeof(this->seq); i++)
                 cout << this->seq[i] << ' ';
             cout << endl << endl;
 #endif // DEBUG
