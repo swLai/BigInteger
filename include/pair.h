@@ -50,7 +50,7 @@ class Pair
             return this->seq;
         }
 
-        template <typename T>
+        template <class T>
         void tidy_that(vector<T> &x)
         {
             vector<T> x_tmp(x);
