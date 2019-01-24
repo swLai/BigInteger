@@ -19,13 +19,11 @@ class Pair {
             unsigned D = N >> 1;
             unsigned L = D >> 1;
             unsigned S = L >> 1;
-            unsigned M = L - 1;
 
 #ifdef DEBUG
             cout << "D=" << D;
             cout << ", L=" << L;
-            cout << ", S=" << S;
-            cout << ", M=" << M << endl;
+            cout << ", S=" << S << endl;
             cout << endl;
 #endif // DEBUG
 
