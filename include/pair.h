@@ -1,15 +1,15 @@
 #ifndef PAIR_H
 #define PAIR_H
 
-//#define DEBUG
-#define EVEN    0
-#define ODD     1
 
+#define DEBUG
+#ifdef DEBUG
 #include <iostream>
 using namespace std;
+#endif
 
-class Pair {
-
+class Pair
+{
     private:
         unsigned* seq;
 
@@ -49,14 +49,12 @@ class Pair {
         unsigned* get_sequence(void)
         {
 #ifdef DEBUG
-            for (unsigned i = 0; i < this->D << 1; i++)
+            for (unsigned i = 0; i < sizeof(seq); i++)
                 cout << this->seq[i] << ' ';
             cout << endl << endl;
 #endif // DEBUG
-
             return this->seq;
         }
 };
-
 
 #endif // PAIR_H
