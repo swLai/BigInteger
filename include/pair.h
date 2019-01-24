@@ -3,8 +3,11 @@
 
 #ifdef DEBUG
 #include <iostream>
-using namespace std;
 #endif
+
+#include <vector>
+
+using namespace std;
 
 class Pair
 {
@@ -36,6 +39,7 @@ class Pair
                 this->seq[pos_shift + 1] = val + 1 + D;
             }
         }
+
         unsigned* get_sequence(void)
         {
 #ifdef DEBUG
@@ -44,6 +48,15 @@ class Pair
             cout << endl << endl;
 #endif // DEBUG
             return this->seq;
+        }
+
+        template <typename T>
+        void tidy_that(vector<T> &x)
+        {
+            vector<T> x_tmp(x);
+            unsigned n = x.size();
+            for (unsigned i = 0; i < n; i++)
+                x[i] = x_tmp[this->seq[i]];
         }
 };
 
