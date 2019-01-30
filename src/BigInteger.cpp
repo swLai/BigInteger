@@ -346,26 +346,26 @@ static void fft(vector<complex_t> &X, bool invert = false)
 {
     long double _signed_2_pi_ = (invert ? -1 : 1) * 2 * acos(-1);
 
-	unsigned n = X.size();
-	Pair(n).tidy_that(X);
+    unsigned n = X.size();
+    Pair(n).tidy_that(X);
 
-	for (unsigned len = 2; len <= n; len <<= 1)
-    {
-        unsigned m = len >> 1;
-        long double theta = _signed_2_pi_ / len;
-		complex_t wlen (cos(theta), sin(theta));
-		for (unsigned i = 0; i < n; i += len)
-        {
+    for (unsigned len = 2; len <= n; len <<= 1)
+	{
+	    unsigned m = len >> 1;
+	    long double theta = _signed_2_pi_ / len;
+	    complex_t wlen (cos(theta), sin(theta));
+	    for (unsigned i = 0; i < n; i += len)
+	    {
             complex_t w (1);
-			for (unsigned j = 0; j < m; ++j)
+            for (unsigned j = 0; j < m; ++j)
             {
                 complex_t tmp = X[ i + j + m] * w;
-				X[ i + j + m ] = X[ i + j ] - tmp;
+                X[ i + j + m ] = X[ i + j ] - tmp;
 				X[ i + j ] += tmp;
-                w = w * wlen;
-			}
-		}
-	}
+				w = w * wlen;
+            }
+        }
+    }
 }
 
 static BigInteger multiply_fft(const BigInteger &lhs, const BigInteger &rhs)
