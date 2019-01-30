@@ -55,7 +55,7 @@ unsigned find_zeros_ahead(unsigned word)
     return abs(SECTION_LEN - len);
 }
 
-string return_zeros(unsigned zeros)
+string generate_zeros_str(unsigned zeros)
 {
     string zeros_str;
     unsigned sections = zeros / SECTION_LEN;

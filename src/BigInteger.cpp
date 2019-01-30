@@ -115,46 +115,34 @@ BigInteger::BigInteger(const BigInteger &bi, bool sign)
 
 BigInteger::BigInteger(const BigInteger &bi, int pow, unsigned base)
 {
-    BigInteger zero = ZERO;
-
-    if (bi == zero || (bi.get_digits() + pow) <= 0 )
-    {
-        *this = zero;
-        return;
-    }
-
-    if (pow == 0)
-    {
-        *this = bi;
-        return;
-    }
-
     if (base == 10)
     {
         stringstream ss;
-        string  feagure_str;
-        ss << bi; ss >> feagure_str;
-
         if (pow > 0)
-            *this = BigInteger(BigInteger(feagure_str + return_zeros(pow)), bi.is_neg());
+        {
+            ss << bi << generate_zeros_str(pow);
+            ss >> *this;
+        }
         else
+        {
+            string  feagure_str;
+            ss << bi;
+            ss >> feagure_str;
             *this = BigInteger(BigInteger(feagure_str.substr(0, feagure_str.size() + pow)), bi.is_neg());
+        }
     }
 }
-
 
 /*
     Streaming Operator
 */
 void BigInteger::print(ostream &out) const
 {
-    if (is_neg())
-        out << "-";
-
+    if (is_neg()) out << "-";
     int words = get_words_len();
     out << get_words(words - 1);
     for (int pos = words - 2; pos > -1; --pos)
-        out << return_zeros(get_zeros_ahead(pos)) << get_words(pos);
+        out << generate_zeros_str(get_zeros_ahead(pos)) << get_words(pos);
 }
 
 ostream& operator << (ostream &out, const BigInteger &bi)
@@ -170,7 +158,6 @@ istream& operator >> (istream &in, BigInteger &bi)
     bi = BigInteger(init_str);
     return in;
 }
-
 
 /*
     Arithmetic Operator
@@ -292,18 +279,19 @@ static BigInteger subtract(const BigInteger &lhs, const BigInteger &rhs)
 
 static BigInteger shift_10r2p(const BigInteger &bi, int pow, unsigned base = 10)
 {
-    if ((int)bi.get_digits() <= -pow)
-        return ZERO;
+    BigInteger zero = ZERO;
+    if (bi == zero) return zero;
+    if (pow == 0) return bi;
+    if ((int)bi.get_digits() <= -pow) return zero;
     return BigInteger(bi, pow, base);
 }
 
 static BigInteger rem_10r2p(const BigInteger &bi, int pow, unsigned base = 10)
 {
+    BigInteger zero = ZERO;
     unsigned pow_abs = abs(pow);
-
-    if (bi.get_digits() <= pow_abs)
-        return bi;
-
+    if (bi == zero) return zero;
+    if (bi.get_digits() <= pow_abs) return bi;
     BigInteger q_10_nPow = shift_10r2p(bi, -pow_abs, base);
     BigInteger q_10_pPow = shift_10r2p(q_10_nPow, pow_abs, base);
     return bi - q_10_pPow;
@@ -410,49 +398,50 @@ static BigInteger multiply_fft(const BigInteger &lhs, const BigInteger &rhs)
     unsigned word, i = 0;
     do {
         if (i < R_len) word_64 += static_cast<unsigned long long>(R[i].real() + 0.5);
-        word = word_64 % BASE;
-        word_64 /= BASE;
-        result.set_word(word, i);
-        result.set_zeros_ahead(find_zeros_ahead(word), i);
+        if (word_64)
+        {
+            word = word_64 % BASE;
+            word_64 /= BASE;
+            result.set_word(word, i);
+            result.set_zeros_ahead(find_zeros_ahead(word), i);
+        }
+        else
+        {
+            result.set_word(0, i);
+            result.set_zeros_ahead(SECTION_LEN-1, i);
+        }
         ++i;
     } while ( i < R_len || word_64 );
 	return result;
 }
 
-static BigInteger divide_recur(const BigInteger &rem_km1, const BigInteger &divisor, const BigInteger &quo_km1,
-                                          const unsigned &divisor_words_len, const unsigned long long &divisor_leadings)
+static BigInteger divide_iteration(const BigInteger &dividend, const BigInteger &divisor, const BigInteger &zero)
 {
-    unsigned rem_km1_words_len = rem_km1.get_words_len();
-    unsigned words_len_diff = rem_km1_words_len - divisor_words_len;
-    double head = static_cast<double>(rem_km1.get_words(rem_km1_words_len - 1)) / divisor_leadings  * (divisor_words_len > 1 ? BASE : 1);
-
-    if (head < 1)
-    {
-        head *= BASE;
-        --words_len_diff;
-    }
-
-    stringstream ss;
-    BigInteger quo_k;
-    ss << static_cast<unsigned>(head) << return_zeros(words_len_diff * SECTION_LEN);
-    ss >> quo_k;
-
-    BigInteger rem_k = rem_km1 - quo_k * divisor;
-
-    if (rem_k < divisor)
-        return quo_km1 + quo_k;
-    else
-        return quo_km1 + divide_recur(rem_k, divisor, quo_k, divisor_words_len, divisor_leadings);
-}
-
-static BigInteger divide(const BigInteger &dividend, const BigInteger &divisor, const BigInteger &zero)
-{
+    BigInteger quo;
     unsigned divisor_words_len = divisor.get_words_len();
     unsigned long long divisor_leadings = divisor_words_len > 1 ?
         static_cast<unsigned long long>(divisor.get_words(divisor_words_len - 1)) * BASE + divisor.get_words(divisor_words_len - 2) :
         static_cast<unsigned long long>(divisor.get_words(divisor_words_len - 1));
 
-    return divide_recur(dividend, divisor, zero, divisor_words_len, divisor_leadings);
+    BigInteger rem_k(dividend), quo_k;
+    while (rem_k >= divisor)
+    {
+        unsigned rem_k_words_len = rem_k.get_words_len();
+        unsigned words_len_diff = rem_k_words_len - divisor_words_len;
+        double head = static_cast<double>(rem_k.get_words(rem_k_words_len - 1)) / divisor_leadings  * (divisor_words_len > 1 ? BASE : 1);
+
+        if (head < 1)
+        {
+            head *= BASE;
+            --words_len_diff;
+        }
+
+        quo_k = shift_10r2p(BigInteger(static_cast<unsigned>(head)), words_len_diff * SECTION_LEN);
+        rem_k -= quo_k * divisor;
+        quo += quo_k;
+    }
+
+    return quo;
 }
 
 BigInteger BigInteger::operator -() const
@@ -533,7 +522,7 @@ BigInteger operator / (BigInteger lhs, const BigInteger &rhs)
     if (rhs == min_one) return -lhs;
 
     return BigInteger(
-        divide(lhs, rhs, zero),
+        divide_iteration(lhs, rhs, zero),
         lhs.is_neg() ^ rhs.is_neg()
     );
 }
@@ -542,7 +531,6 @@ BigInteger operator % (BigInteger lhs, const BigInteger &rhs)
 {
     return lhs - (lhs / rhs) * rhs;
 }
-
 
 /*
     Increment / Decrement Operator
@@ -658,7 +646,6 @@ bool operator < (const BigInteger &lhs, const BigInteger &rhs)
         return true;
 }
 
-
 /*
     Assignment Operator
 */
@@ -699,7 +686,6 @@ BigInteger& BigInteger::operator %= (const BigInteger &rhs)
     *this = *this % rhs;
     return *this;
 }
-
 
 /*
     Math Functions
