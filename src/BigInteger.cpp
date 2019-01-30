@@ -4,10 +4,10 @@
 #include <complex>
 #include <cmath>
 
+#include "../include/BigInteger.h"
 #include "../include/define.h"
 #include "../include/utility.h"
 #include "../include/pair.h"
-#include "../include/BigInteger.h"
 
 #ifndef ZERO
     #define ZERO                    BigInteger(0)
@@ -344,28 +344,31 @@ static BigInteger multiply_karatsuba(const BigInteger &lhs, const BigInteger &rh
 
 static void fft(vector<complex_t> &X, bool invert = false)
 {
+	unsigned n = X.size();
+	Pair(n).tidy_that(X);
+
     long double _signed_2_pi_ = (invert ? -1 : 1) * 2 * acos(-1);
-
-    unsigned n = X.size();
-    Pair(n).tidy_that(X);
-
-    for (unsigned len = 2; len <= n; len <<= 1)
-	{
-	    unsigned m = len >> 1;
-	    long double theta = _signed_2_pi_ / len;
-	    complex_t wlen (cos(theta), sin(theta));
-	    for (unsigned i = 0; i < n; i += len)
-	    {
+	for (unsigned len = 2; len <= n; len <<= 1)
+    {
+        unsigned m = len >> 1;
+        long double theta = _signed_2_pi_ / len;
+		complex_t wlen (cos(theta), sin(theta));
+		for (unsigned i = 0; i < n; i += len)
+        {
             complex_t w (1);
-            for (unsigned j = 0; j < m; ++j)
+			for (unsigned j = 0; j < m; ++j)
             {
                 complex_t tmp = X[ i + j + m] * w;
-                X[ i + j + m ] = X[ i + j ] - tmp;
+				X[ i + j + m ] = X[ i + j ] - tmp;
 				X[ i + j ] += tmp;
-				w = w * wlen;
-            }
-        }
-    }
+                w = w * wlen;
+			}
+		}
+	}
+
+	if (invert)
+		for (auto &ele : X)
+			ele /= n;
 }
 
 static BigInteger multiply_fft(const BigInteger &lhs, const BigInteger &rhs)
@@ -399,15 +402,14 @@ static BigInteger multiply_fft(const BigInteger &lhs, const BigInteger &rhs)
 	fft(R, true);
 
 	unsigned R_len = n-1;
-	while ( static_cast<unsigned long long>(R[R_len].real() / n + 0.5) == 0 && R_len > 0 ) --R_len;
+	while ( static_cast<unsigned long long>(R[R_len].real() + 0.5) == 0 && R_len > 0 ) --R_len;
 	++R_len;
 
 	BigInteger result;
-	unsigned long long word_64 = 0;
-	unsigned word, i = 0;
-    do
-    {
-        if (i < R_len) word_64 += static_cast<unsigned long long>(R[i].real() / n + 0.5);
+    unsigned long long word_64 = 0;
+    unsigned word, i = 0;
+    do {
+        if (i < R_len) word_64 += static_cast<unsigned long long>(R[i].real() + 0.5);
         word = word_64 % BASE;
         word_64 /= BASE;
         result.set_word(word, i);
