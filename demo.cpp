@@ -1,4 +1,5 @@
 #include <iostream>
+#include <chrono>
 
 #include "./include/BigInteger.h"
 
@@ -30,13 +31,31 @@ int main()
 
     // Testing basic arithmetic computation
     cout << "Testing basic arithmetic computation... " << endl;
-    cout << "-(1) + (2) = " << -bigint_1 + bigint_2 << endl;
-    cout << "(1) * (2) = " << bigint_1 * bigint_2 << endl;
+    cout << "------------------" << endl;
+
+    auto start_t = chrono::steady_clock::now();
+    BigInteger add_r = bigint_1 + bigint_2;
+    auto add_time = chrono::steady_clock::now() - start_t;
+    cout << "(1) + (2) = " << add_r << endl;
+    cout << "addition time = " << chrono::duration<double, nano> (add_time).count() << "ns" << endl << endl;
+
+    start_t = chrono::steady_clock::now();
+    BigInteger product = bigint_1 * bigint_2;
+    auto mul_time = chrono::steady_clock::now() - start_t;
+    cout << "(1) * (2) = " << product << endl;
+    cout << "multiplication time = " << chrono::duration<double, milli>(mul_time).count() << "ms" << endl << endl;
+
+    start_t = chrono::steady_clock::now();
     BigInteger quotient = bigint_1 / bigint_2;
+    auto div_time = chrono::steady_clock::now() - start_t;
     cout << "(1) / (2) = " << quotient << endl;
+    cout << "division time = " << chrono::duration<double, milli>(div_time).count() << "ms" << endl << endl;
+
+    start_t = chrono::steady_clock::now();
     BigInteger remainder = bigint_1 % bigint_2;
+    auto mod_time = chrono::steady_clock::now() - start_t;
     cout << "(1) % (2) = " << remainder << endl;
-    cout << endl;
+    cout << "modulo time = " << chrono::duration<double, milli>(mod_time).count() << "ms" << endl << endl;
 
     // Verifying the consistence of the results
     cout << "Verifying the consistence of the results... " << endl;
