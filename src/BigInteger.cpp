@@ -3,6 +3,7 @@
 #include <vector>
 #include <complex>
 #include <cmath>
+#include <iomanip>
 
 #include "../include/BigInteger.h"
 #include "../include/define.h"
@@ -115,6 +116,10 @@ BigInteger::BigInteger(const BigInteger &bi, bool sign)
 
 BigInteger::BigInteger(const BigInteger &bi, int pow, unsigned base)
 {
+    BigInteger zero = ZERO;
+    if (bi == zero || static_cast<int>(bi.get_digits()) + pow <= 0) *this = zero;
+    if (pow == 0) *this = bi;
+
     if (base == 10)
     {
         stringstream ss;
@@ -279,10 +284,6 @@ static BigInteger subtract(const BigInteger &lhs, const BigInteger &rhs)
 
 static BigInteger shift_10r2p(const BigInteger &bi, int pow, unsigned base = 10)
 {
-    BigInteger zero = ZERO;
-    if (bi == zero) return zero;
-    if (pow == 0) return bi;
-    if ((int)bi.get_digits() <= -pow) return zero;
     return BigInteger(bi, pow, base);
 }
 
