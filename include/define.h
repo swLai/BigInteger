@@ -19,6 +19,6 @@
 #define SECTION_ZERO         ZERO_6_APX
 
 #include <complex>
-using complex_t = std::complex<long double>;
+using complex_t = std::complex<double>;
 
 #endif // DEFINE_H
