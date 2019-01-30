@@ -405,7 +405,8 @@ static BigInteger multiply_fft(const BigInteger &lhs, const BigInteger &rhs)
 	BigInteger result;
 	unsigned long long word_64 = 0;
 	unsigned word, i = 0;
-	do {
+    do
+    {
         if (i < R_len) word_64 += static_cast<unsigned long long>(R[i].real() / n + 0.5);
         word = word_64 % BASE;
         word_64 /= BASE;
