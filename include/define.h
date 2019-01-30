@@ -16,7 +16,6 @@
 #define BASE                        1000000
 #define SECTION_LEN            6
 #define SECTION_MAX           999999
-#define SECTION_MASK         0x3FFFFFFF
 #define SECTION_ZERO         ZERO_6_APX
 
 #include <complex>
