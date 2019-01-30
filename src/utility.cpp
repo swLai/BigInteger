@@ -54,3 +54,37 @@ unsigned find_zeros_ahead(unsigned word)
     unsigned len = s.length();
     return abs(SECTION_LEN - len);
 }
+
+string return_zeros(unsigned zeros)
+{
+    string zeros_str;
+    unsigned sections = zeros / SECTION_LEN;
+    unsigned zeros_remain = zeros % SECTION_LEN;
+
+    while(sections--)
+        zeros_str += SECTION_ZERO;
+
+    switch (zeros_remain)
+    {
+        case 0:
+            return zeros_str;
+        case 1:
+            return zeros_str + ZERO_1_APX;
+        case 2:
+            return zeros_str + ZERO_2_APX;
+        case 3:
+            return zeros_str + ZERO_3_APX;
+        case 4:
+            return zeros_str + ZERO_4_APX;
+        case 5:
+            return zeros_str + ZERO_5_APX;
+        case 6:
+            return zeros_str + ZERO_6_APX;
+        case 7:
+            return zeros_str + ZERO_7_APX;
+        case 8:
+            return zeros_str + ZERO_8_APX;
+        default:
+            return zeros_str;
+    }
+}

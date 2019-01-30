@@ -2,9 +2,9 @@
 #define BIGINTEGER_H
 
 #include <vector>
-#include "define.h"
-
 using namespace std;
+
+#include "define.h"
 
 class BigInteger
 {
@@ -68,7 +68,7 @@ class BigInteger
         unsigned get_digits(void) const {
             unsigned words = this->words.size();
             unsigned zeros_ahead = this->get_zeros_ahead(words-1);
-            return (SECTION_LEN * words - zeros_ahead);
+            return (words * SECTION_LEN - zeros_ahead);
         }
         void del_word(unsigned pos) {
             if (pos < this->words.size()) {
@@ -103,6 +103,8 @@ class BigInteger
         // Arithmetic Operator (friend)
         BigInteger operator -() const;
         friend BigInteger operator+(BigInteger, const BigInteger &);
+        friend BigInteger operator+(BigInteger, const int &);
+        friend BigInteger operator+(int, const BigInteger &);
         friend BigInteger operator-(BigInteger,  const BigInteger &);
         friend BigInteger operator * (BigInteger, const BigInteger &);
         friend BigInteger operator / (BigInteger, const BigInteger &);
@@ -120,6 +122,8 @@ ostream& operator << (ostream &, const BigInteger &);
 
 // Arithmetic Operator
 BigInteger operator+(BigInteger, const BigInteger &);
+BigInteger operator+(BigInteger, const int &);
+BigInteger operator+(int, const BigInteger &);
 BigInteger operator-(BigInteger, const BigInteger &);
 BigInteger operator * (BigInteger, const BigInteger &);
 BigInteger operator / (BigInteger, const BigInteger &);

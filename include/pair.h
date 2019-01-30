@@ -1,44 +1,57 @@
 #ifndef PAIR_H
 #define PAIR_H
 
+#include <vector>
+using namespace std;
+
 class Pair
 {
     private:
-        unsigned* seq;
+        vector<unsigned> seq;
 
     public:
         Pair(unsigned N)
         {
-            unsigned D = N >> 1;
-            unsigned L = D >> 1;
-            unsigned S = L >> 1;
+            seq = vector<unsigned>(N, 0);
+            pair_generate(seq);
+        }
 
-            this->seq = new unsigned [N];
-            for (unsigned i = 0; i < S; i++)
-            {
-                unsigned tmp = i << 1;
-                this->seq[tmp] = tmp;
-                this->seq[tmp + L] = tmp + 1;
-            }
+        void pair_generate(vector<unsigned> &seq)
+        {
+            auto N_reduced = seq.size() >> 2;
 
-            for (unsigned i = 0; i < L; i++)
+            switch (N_reduced)
             {
-                unsigned pos = i << 1, pos_shift = pos + D;
-                unsigned  val = this->seq[pos] << 1;
-                this->seq[pos] = val;
-                this->seq[pos + 1]= val + D;
-                this->seq[pos_shift] = val + 1;
-                this->seq[pos_shift + 1] = val + 1 + D;
+                case 0:
+                    seq = vector<unsigned>{0, 1};
+                    return;
+
+                case 1:
+                    seq = vector<unsigned>{0, 2, 1, 3};
+                    return;
+
+                default:
+                {
+                    vector<unsigned> par(N_reduced, 0);
+                    pair_generate(par);
+                    for (auto &ele : par) ele <<= 2;
+                    vector<unsigned> gen{0, 2, 1, 3};
+                    unsigned i = 0;
+                    for (auto g : gen)
+                        for (auto ele : par)
+                            seq[i++] = ele + g;
+                    return;
+                }
             }
         }
 
-        template <class T>
-        void tidy_that(std::vector<T> &x)
+        template <typename T>
+        void tidy_that(vector<T> &x)
         {
-            auto x_tmp(x);
-            unsigned n = x.size();
-            for (unsigned i = 0; i < n; i++)
-                x[i] = x_tmp[this->seq[i]];
+            vector<T> x_tmp(x);
+            auto n = x_tmp.size();
+            while (n--)
+                x[n] = x_tmp[ this->seq[n] ];
         }
 };
 

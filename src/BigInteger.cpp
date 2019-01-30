@@ -1,20 +1,13 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <complex>
 #include <cmath>
-#include "../include/BigInteger.h"
+
 #include "../include/define.h"
 #include "../include/utility.h"
-
-#define ZERO_9_APX             "000000000"
-#define ZERO_8_APX             "00000000"
-#define ZERO_7_APX             "0000000"
-#define ZERO_6_APX             "000000"
-#define ZERO_5_APX             "00000"
-#define ZERO_4_APX             "0000"
-#define ZERO_3_APX             "000"
-#define ZERO_2_APX             "00"
-#define ZERO_1_APX             "0"
+#include "../include/pair.h"
+#include "../include/BigInteger.h"
 
 #ifndef ZERO
     #define ZERO                    BigInteger(0)
@@ -27,6 +20,7 @@
 #endif // MIN_ONE
 
 using namespace std;
+
 
 /*
     Constructor
@@ -41,9 +35,17 @@ BigInteger::BigInteger()
 
 BigInteger::BigInteger(int word)
 {
-    unsigned word_u = (word & SECTION_MASK) % BASE;
+    unsigned word_u = abs(word) % BASE;
     set_word(word_u, 0);
     set_zeros_ahead(find_zeros_ahead(word_u), 0);
+
+    word_u /= BASE;
+    if (word_u)
+    {
+        set_word(word_u, 1);
+        set_zeros_ahead(find_zeros_ahead(word_u), 1);
+    }
+
     if (word < 0)
         set_sign(true);
     else
@@ -55,6 +57,9 @@ BigInteger::BigInteger(string init_str)
     if (!feagure_string_valid_check(init_str))
     {
         cout << "The value is not a complete integer number!\n" << endl;
+        set_word(0, 0);
+        set_zeros_ahead(SECTION_LEN-1, 0);
+        set_sign(false);
         return;
     }
 
@@ -69,17 +74,16 @@ BigInteger::BigInteger(string init_str)
         len--;
     }
 
-    unsigned words = ceil((float)len / SECTION_LEN);
+    unsigned words = ceil(static_cast<double>(len) / SECTION_LEN);
     int shift = len;
     string feagures_str, feagure_sec;
-    for (unsigned i = 0; i < words; i++)
+    for (unsigned i = 0; i < words; ++i)
     {
         shift -= SECTION_LEN;
-        if (shift < 0) {
+        if (shift < 0)
             feagure_sec = init_str.substr(0, shift + SECTION_LEN);
-        } else {
+        else
             feagure_sec = init_str.substr(shift, SECTION_LEN);
-        }
         feagures_str += ' ' + feagure_sec;
     }
 
@@ -87,20 +91,23 @@ BigInteger::BigInteger(string init_str)
     unsigned word;
     unsigned pos = 0;
     ss << feagures_str;
-    while (ss >> word) {
+    while (ss >> word)
+    {
         set_word(word, pos);
         set_zeros_ahead(find_zeros_ahead(word), pos);
-        pos++;
+        ++pos;
     }
 }
 
-BigInteger::BigInteger(const BigInteger &bi){
+BigInteger::BigInteger(const BigInteger &bi)
+{
     this->words = bi.get_words();
     this->zeros_ahead = bi.get_zeros_ahead();
     this->sign = bi.is_neg();
 }
 
-BigInteger::BigInteger(const BigInteger &bi, bool sign) {
+BigInteger::BigInteger(const BigInteger &bi, bool sign)
+{
     this->words = bi.get_words();
     this->zeros_ahead = bi.get_zeros_ahead();
     this->sign = sign;
@@ -109,109 +116,32 @@ BigInteger::BigInteger(const BigInteger &bi, bool sign) {
 BigInteger::BigInteger(const BigInteger &bi, int pow, unsigned base)
 {
     BigInteger zero = ZERO;
-    if (bi == zero)
-        *this = zero;
-    else
+
+    if (bi == zero || (bi.get_digits() + pow) <= 0 )
     {
-        if (base == 10)
-        {
-            stringstream ss;
-            string  shifted_feagure_str, feagure_str;
-            ss << bi; ss >> feagure_str;
+        *this = zero;
+        return;
+    }
 
-            if (pow >= 0)
-            {
-                string zeros_str;
-                unsigned shift_sections = pow / SECTION_LEN;
-                unsigned shift_remaining_digits = pow % SECTION_LEN;
+    if (pow == 0)
+    {
+        *this = bi;
+        return;
+    }
 
-                while(shift_sections--)
-                    zeros_str += ZERO_9_APX;
+    if (base == 10)
+    {
+        stringstream ss;
+        string  feagure_str;
+        ss << bi; ss >> feagure_str;
 
-                switch (shift_remaining_digits)
-                {
-                case 5:
-                    zeros_str += ZERO_5_APX;
-                    break;
-                case 4:
-                    zeros_str += ZERO_4_APX;
-                    break;
-                case 8:
-                    zeros_str += ZERO_8_APX;
-                    break;
-                case 1:
-                    zeros_str += ZERO_1_APX;
-                    break;
-                case 7:
-                    zeros_str += ZERO_7_APX;
-                    break;
-                case 2:
-                    zeros_str += ZERO_2_APX;
-                    break;
-                case 6:
-                    zeros_str += ZERO_6_APX;
-                    break;
-                case 3:
-                    zeros_str += ZERO_3_APX;
-                    break;
-                default:
-                    break;
-                }
-                shifted_feagure_str = feagure_str + zeros_str;
-            }
-            else
-            {
-                int shift_digits =  feagure_str.size() + pow;
-                if (shift_digits > 0)
-                    shifted_feagure_str = feagure_str.substr(0, shift_digits);
-                else
-                    shifted_feagure_str = ZERO_1_APX;
-            }
-            *this = BigInteger(BigInteger(shifted_feagure_str), bi.is_neg());
-        }
+        if (pow > 0)
+            *this = BigInteger(BigInteger(feagure_str + return_zeros(pow)), bi.is_neg());
+        else
+            *this = BigInteger(BigInteger(feagure_str.substr(0, feagure_str.size() + pow)), bi.is_neg());
     }
 }
 
-/*
-    Assignment Operator
-*/
-BigInteger& BigInteger::operator=(const BigInteger &rhs)
-{
-    this->words = rhs.get_words();
-    this->zeros_ahead = rhs.get_zeros_ahead();
-    this->sign = rhs.is_neg();
-    return *this;
-}
-
-BigInteger& BigInteger::operator += (const BigInteger &rhs)
-{
-    *this = *this + rhs;
-    return *this;
-}
-
-BigInteger& BigInteger::operator -= (const BigInteger &rhs)
-{
-    *this = *this - rhs;
-    return *this;
-}
-
-BigInteger& BigInteger::operator *= (const BigInteger &rhs)
-{
-    *this = *this * rhs;
-    return *this;
-}
-
-BigInteger& BigInteger::operator /= (const BigInteger &rhs)
-{
-    *this = *this / rhs;
-    return *this;
-}
-
-BigInteger& BigInteger::operator %= (const BigInteger &rhs)
-{
-    *this = *this % rhs;
-    return *this;
-}
 
 /*
     Streaming Operator
@@ -221,18 +151,10 @@ void BigInteger::print(ostream &out) const
     if (is_neg())
         out << "-";
 
-    string zeros_str;
     int words = get_words_len();
-    unsigned zeros;
     out << get_words(words - 1);
-    for (int pos = words - 2; pos > -1; pos--)
-    {
-        zeros = get_zeros_ahead(pos);
-        for(unsigned i = 0; i < zeros; i++)
-            zeros_str += ZERO_1_APX;
-        out << zeros_str << get_words(pos);
-        zeros_str.erase(0);
-    }
+    for (int pos = words - 2; pos > -1; --pos)
+        out << return_zeros(get_zeros_ahead(pos)) << get_words(pos);
 }
 
 ostream& operator << (ostream &out, const BigInteger &bi)
@@ -249,6 +171,7 @@ istream& operator >> (istream &in, BigInteger &bi)
     return in;
 }
 
+
 /*
     Arithmetic Operator
 */
@@ -260,7 +183,7 @@ static BigInteger add(const BigInteger &lhs, const BigInteger &rhs)
     unsigned sub_result;
     unsigned carry = 0;
 
-    for (unsigned i = 0; i < result_words; i++)
+    for (unsigned i = 0; i < result_words; ++i)
     {
         if (i < rhs_words)
         {
@@ -275,14 +198,14 @@ static BigInteger add(const BigInteger &lhs, const BigInteger &rhs)
         {
 			while (carry && i < result_words)
 			{
-				sub_result = result.get_words(i) + carry;
+			    sub_result = result.get_words(i) + carry;
 
 				if (sub_result > SECTION_MAX)
                 {
                     result.set_word(0, i);
-                    result.set_zeros_ahead(8, i);
+                    result.set_zeros_ahead(SECTION_LEN-1, i);
                     carry = 1;
-                    i++;
+                    ++i;
                 }
                 else
                 {
@@ -311,7 +234,7 @@ static BigInteger subtract(const BigInteger &lhs, const BigInteger &rhs)
     int sub_result;
     unsigned carry = 0;
 
-    for (unsigned i = 0; i < result_words; i++)
+    for (unsigned i = 0; i < result_words; ++i)
     {
         if (i < rhs_words)
         {
@@ -342,7 +265,7 @@ static BigInteger subtract(const BigInteger &lhs, const BigInteger &rhs)
                     result.set_word(SECTION_MAX, i);
                     result.set_zeros_ahead(0, i);
                     carry = 1;
-                    i++;
+                    ++i;
                 }
                 else
                 {
@@ -361,7 +284,7 @@ static BigInteger subtract(const BigInteger &lhs, const BigInteger &rhs)
     {
         result.del_word(i);
         result.del_zeros_ahead(i);
-        i--;
+        --i;
     }
 
     return result;
@@ -419,49 +342,118 @@ static BigInteger multiply_karatsuba(const BigInteger &lhs, const BigInteger &rh
     }
 }
 
+static void fft(vector<complex_t> &X, bool invert = false)
+{
+    long double _signed_2_pi_ = (invert ? -1 : 1) * 2 * acos(-1);
+
+	unsigned n = X.size();
+	Pair(n).tidy_that(X);
+
+	for (unsigned len = 2; len <= n; len <<= 1)
+    {
+        unsigned m = len >> 1;
+        long double theta = _signed_2_pi_ / len;
+		complex_t wlen (cos(theta), sin(theta));
+		for (unsigned i = 0; i < n; i += len)
+        {
+            complex_t w (1);
+			for (unsigned j = 0; j < m; ++j)
+            {
+                complex_t tmp = X[ i + j + m] * w;
+				X[ i + j + m ] = X[ i + j ] - tmp;
+				X[ i + j ] += tmp;
+                w = w * wlen;
+			}
+		}
+	}
+}
+
+static BigInteger multiply_fft(const BigInteger &lhs, const BigInteger &rhs)
+{
+    unsigned lhs_words_len = lhs.get_words_len();
+    unsigned rhs_words_len = rhs.get_words_len();
+
+    unsigned n = pow(2, ceil(log2(lhs_words_len + rhs_words_len)));
+    vector<complex_t> Z(n, 0);
+    for (unsigned i = 0; i < n; ++i)
+    {
+        Z[i] = complex_t {
+            i < lhs_words_len ? lhs.get_words(i) : 0,
+            i < rhs_words_len ? rhs.get_words(i) : 0
+        };
+    }
+
+    fft(Z);
+
+    vector<complex_t> R(n, 0);
+	for(unsigned i = 1; i < n; ++i)
+	{
+		long double x_real = Z[i].real(), x_imag = Z[i].imag();
+		long double y_real = Z[n - i].real(), y_imag = Z[n - i].imag();
+		complex_t LHS_i = complex_t{ (x_real + y_real) / 2, (x_imag - y_imag) / 2 };
+		complex_t RHS_i = complex_t{ (x_imag + y_imag) / 2, -(x_real - y_real) / 2 };
+		R[i] = LHS_i * RHS_i;
+	}
+	R[0] = Z[0].imag() * Z[0].real();
+
+	fft(R, true);
+
+	unsigned R_len = n-1;
+	while ( static_cast<unsigned long long>(R[R_len].real() / n + 0.5) == 0 && R_len > 0 ) --R_len;
+	++R_len;
+
+	BigInteger result;
+    unsigned long long word_64 = 0;
+    unsigned word, i = 0;
+    do {
+        if (i < R_len) word_64 += static_cast<unsigned long long>(R[i].real() / n + 0.5);
+        word = word_64 % BASE;
+        word_64 /= BASE;
+        result.set_word(word, i);
+        result.set_zeros_ahead(find_zeros_ahead(word), i);
+        ++i;
+    } while ( i < R_len || word_64 );
+	return result;
+}
+
 static BigInteger divide_recur(const BigInteger &rem_km1, const BigInteger &divisor, const BigInteger &quo_km1,
-                             const unsigned &divisor_words_len, const unsigned long long &divisor_leadings)
+                                          const unsigned &divisor_words_len, const unsigned long long &divisor_leadings)
 {
     unsigned rem_km1_words_len = rem_km1.get_words_len();
     unsigned words_len_diff = rem_km1_words_len - divisor_words_len;
-    double head = (double)rem_km1.get_words(rem_km1_words_len - 1) / divisor_leadings  * (divisor_words_len > 1 ? BASE : 1);
+    double head = static_cast<double>(rem_km1.get_words(rem_km1_words_len - 1)) / divisor_leadings  * (divisor_words_len > 1 ? BASE : 1);
 
     if (head < 1)
     {
         head *= BASE;
-        words_len_diff--;
+        --words_len_diff;
     }
-
-    string zeros_str;
-    for (unsigned i = 0; i < words_len_diff; i++)
-        zeros_str += ZERO_9_APX;
 
     stringstream ss;
     BigInteger quo_k;
-    ss << (unsigned)head << zeros_str;
+    ss << static_cast<unsigned>(head) << return_zeros(words_len_diff * SECTION_LEN);
     ss >> quo_k;
 
-    BigInteger dummy = quo_k * divisor;
-    BigInteger rem_k = rem_km1 - dummy;
+    BigInteger rem_k = rem_km1 - quo_k * divisor;
 
     if (rem_k < divisor)
         return quo_km1 + quo_k;
     else
-        return quo_km1 + divide_recur(rem_k, divisor, quo_k, divisor_words_len, divisor_leadings);//divide(rem_k, divisor, quo_k);
+        return quo_km1 + divide_recur(rem_k, divisor, quo_k, divisor_words_len, divisor_leadings);
 }
 
 static BigInteger divide(const BigInteger &dividend, const BigInteger &divisor, const BigInteger &zero)
 {
     unsigned divisor_words_len = divisor.get_words_len();
     unsigned long long divisor_leadings = divisor_words_len > 1 ?
-        (unsigned long long)divisor.get_words(divisor_words_len - 1) * BASE + divisor.get_words(divisor_words_len - 2) :
-        (unsigned long long)divisor.get_words(divisor_words_len - 1);
+        static_cast<unsigned long long>(divisor.get_words(divisor_words_len - 1)) * BASE + divisor.get_words(divisor_words_len - 2) :
+        static_cast<unsigned long long>(divisor.get_words(divisor_words_len - 1));
 
     return divide_recur(dividend, divisor, zero, divisor_words_len, divisor_leadings);
 }
 
 BigInteger BigInteger::operator -() const
-{ // unary minus sign
+{
     return BigInteger(*this, !this->is_neg());
 }
 
@@ -490,6 +482,18 @@ BigInteger operator + (BigInteger lhs, const BigInteger &rhs)
     }
 }
 
+BigInteger operator+(BigInteger bi, const int &x)
+{
+    if (x == 0) return bi;
+    return bi + BigInteger(x);
+}
+
+BigInteger operator+(int x, const BigInteger &bi)
+{
+    if (x == 0) return bi;
+    return bi + BigInteger(x);
+}
+
 BigInteger operator - (BigInteger lhs, const BigInteger &rhs)
 {
     return lhs + (-rhs);
@@ -506,7 +510,7 @@ BigInteger operator * (BigInteger lhs, const BigInteger &rhs)
     if (rhs == min_one) return -lhs;
 
     return BigInteger(
-        multiply_karatsuba(lhs, rhs), // may adopt other faster multiplying methods
+        multiply_fft(lhs, rhs), // multiply_karatsuba(lhs, rhs),
         lhs.is_neg() ^ rhs.is_neg()
     );
 }
@@ -535,6 +539,7 @@ BigInteger operator % (BigInteger lhs, const BigInteger &rhs)
 {
     return lhs - (lhs / rhs) * rhs;
 }
+
 
 /*
     Increment / Decrement Operator
@@ -575,7 +580,7 @@ bool operator == (const BigInteger &lhs, const BigInteger &rhs)
         if (lhs.is_neg() == rhs.is_neg())
         {
             unsigned lhs_words = lhs.get_words_len();
-            for (unsigned i = 0; i < lhs_words; i++)
+            for (unsigned i = 0; i < lhs_words; ++i)
             {
                 if (lhs.get_words(i) != rhs.get_words(i))
                     return false;
@@ -615,7 +620,7 @@ bool operator > (const BigInteger &lhs, const BigInteger &rhs)
         {
             // equal sign
             int lhs_words = lhs.get_words_len();
-            for (int i = lhs_words - 1; i >= 0; i--)
+            for (int i = lhs_words - 1; i >= 0; --i)
             {
                 if (lhs.get_words(i) > rhs.get_words(i))
                     return !lhs.is_neg();
@@ -649,6 +654,49 @@ bool operator < (const BigInteger &lhs, const BigInteger &rhs)
     else
         return true;
 }
+
+
+/*
+    Assignment Operator
+*/
+BigInteger& BigInteger::operator=(const BigInteger &rhs)
+{
+    this->words = rhs.get_words();
+    this->zeros_ahead = rhs.get_zeros_ahead();
+    this->sign = rhs.is_neg();
+    return *this;
+}
+
+BigInteger& BigInteger::operator += (const BigInteger &rhs)
+{
+    *this = *this + rhs;
+    return *this;
+}
+
+BigInteger& BigInteger::operator -= (const BigInteger &rhs)
+{
+    *this = *this - rhs;
+    return *this;
+}
+
+BigInteger& BigInteger::operator *= (const BigInteger &rhs)
+{
+    *this = *this * rhs;
+    return *this;
+}
+
+BigInteger& BigInteger::operator /= (const BigInteger &rhs)
+{
+    *this = *this / rhs;
+    return *this;
+}
+
+BigInteger& BigInteger::operator %= (const BigInteger &rhs)
+{
+    *this = *this % rhs;
+    return *this;
+}
+
 
 /*
     Math Functions
