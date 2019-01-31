@@ -546,7 +546,7 @@ BigInteger operator - (BigInteger bi,  const long long &x)
 
 BigInteger operator - (long long x,  const BigInteger &bi)
 {
-    return bi - BigInteger(x);
+    return BigInteger(x) - bi;
 }
 
 BigInteger operator * (BigInteger lhs, const BigInteger &rhs)
