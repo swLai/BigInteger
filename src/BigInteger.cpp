@@ -448,7 +448,7 @@ static BigInteger divide_iteration(const BigInteger &dividend, const BigInteger 
                 static_cast<unsigned long long>(rem_k.get_words(rem_k_words_len - 1)));
         unsigned rem_k_leadings_len = rem_k_words_len > 2 ? 3 : rem_k_words_len > 1 ? 2 : 1;
         unsigned words_len_diff = rem_k_words_len - divisor_words_len - rem_k_leadings_len + divisor_leadings_len;
-        double head =  rem_k_leadings / static_cast<double>(divisor_leadings);
+        double head =  static_cast<double>(rem_k_leadings) / divisor_leadings;
 
         while (head < 1)
         {
