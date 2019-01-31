@@ -53,7 +53,7 @@ BigInteger::BigInteger(long long word)
         word /= BASE;
         set_word(word_u, i);
         set_zeros_ahead(find_zeros_ahead(word_u), i);
-        i++;
+        ++i;
     }
 }
 
@@ -76,7 +76,7 @@ BigInteger::BigInteger(string init_str)
         if (init_str[0] == '-') set_sign(true);
         else set_sign(false);
         init_str.erase(0, 1); // erase the sign character
-        len--;
+        --len;
     }
 
     unsigned words = ceil(static_cast<double>(len) / SECTION_LEN);
