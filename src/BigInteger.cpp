@@ -34,23 +34,27 @@ BigInteger::BigInteger()
     set_sign(false);
 }
 
-BigInteger::BigInteger(int word)
+BigInteger::BigInteger(long long word)
 {
-    unsigned word_u = abs(word) % BASE;
-    set_word(word_u, 0);
-    set_zeros_ahead(find_zeros_ahead(word_u), 0);
-
-    word_u /= BASE;
-    if (word_u)
-    {
-        set_word(word_u, 1);
-        set_zeros_ahead(find_zeros_ahead(word_u), 1);
-    }
-
     if (word < 0)
         set_sign(true);
     else
         set_sign(false);
+
+    unsigned word_u = abs(word) % BASE;
+    set_word(word_u, 0);
+    set_zeros_ahead(find_zeros_ahead(word_u), 0);
+    word /= BASE;
+
+    unsigned i = 1;
+    while (word)
+    {
+        unsigned word_u = abs(word) % BASE;
+        word /= BASE;
+        set_word(word_u, i);
+        set_zeros_ahead(find_zeros_ahead(word_u), i);
+        i++;
+    }
 }
 
 BigInteger::BigInteger(string init_str)
@@ -420,24 +424,39 @@ static BigInteger divide_iteration(const BigInteger &dividend, const BigInteger 
 {
     BigInteger quo;
     unsigned divisor_words_len = divisor.get_words_len();
-    unsigned long long divisor_leadings = divisor_words_len > 1 ?
-        static_cast<unsigned long long>(divisor.get_words(divisor_words_len - 1)) * BASE + divisor.get_words(divisor_words_len - 2) :
-        static_cast<unsigned long long>(divisor.get_words(divisor_words_len - 1));
+    unsigned long long divisor_leadings = (divisor_words_len > 2 ?
+        static_cast<unsigned long long>(divisor.get_words(divisor_words_len - 1)) * BASE_SQR +
+            static_cast<unsigned long long>(divisor.get_words(divisor_words_len - 2)) * BASE +
+                divisor.get_words(divisor_words_len - 3) :
+        divisor_words_len > 1 ?
+            static_cast<unsigned long long>(divisor.get_words(divisor_words_len - 1)) * BASE +
+                divisor.get_words(divisor_words_len - 2) :
+            static_cast<unsigned long long>(divisor.get_words(divisor_words_len - 1)));
+    unsigned divisor_leadings_len = divisor_words_len > 2 ? 3 : divisor_words_len > 1 ? 2 : 1;
 
     BigInteger rem_k(dividend), quo_k;
     while (rem_k >= divisor)
     {
         unsigned rem_k_words_len = rem_k.get_words_len();
-        unsigned words_len_diff = rem_k_words_len - divisor_words_len;
-        double head = static_cast<double>(rem_k.get_words(rem_k_words_len - 1)) / divisor_leadings  * (divisor_words_len > 1 ? BASE : 1);
+        unsigned long long rem_k_leadings = (rem_k_words_len > 2 ?
+            static_cast<unsigned long long>(rem_k.get_words(rem_k_words_len - 1)) * BASE_SQR +
+                static_cast<unsigned long long>(rem_k.get_words(rem_k_words_len - 2)) * BASE +
+                    rem_k.get_words(rem_k_words_len - 3) :
+            rem_k_words_len > 1 ?
+                static_cast<unsigned long long>(rem_k.get_words(rem_k_words_len - 1)) * BASE +
+                    rem_k.get_words(rem_k_words_len - 2) :
+                static_cast<unsigned long long>(rem_k.get_words(rem_k_words_len - 1)));
+        unsigned rem_k_leadings_len = rem_k_words_len > 2 ? 3 : rem_k_words_len > 1 ? 2 : 1;
+        unsigned words_len_diff = rem_k_words_len - divisor_words_len - rem_k_leadings_len + divisor_leadings_len;
+        double head =  rem_k_leadings / static_cast<double>(divisor_leadings);
 
-        if (head < 1)
+        while (head < 1)
         {
             head *= BASE;
             --words_len_diff;
         }
 
-        quo_k = shift_10r2p(BigInteger(static_cast<unsigned>(head)), words_len_diff * SECTION_LEN);
+        quo_k = shift_10r2p(BigInteger(static_cast<unsigned long long>(head)), words_len_diff * SECTION_LEN);
         rem_k -= quo_k * divisor;
         quo += quo_k;
     }

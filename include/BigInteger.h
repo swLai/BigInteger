@@ -17,7 +17,7 @@ class BigInteger
         // no initializer
         BigInteger();
         // initialized by integer
-        BigInteger(int);
+        BigInteger(long long);
         // initialized by feagure string
         BigInteger(string);
         // initialized by computational BIs

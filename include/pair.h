@@ -30,6 +30,10 @@ class Pair
                     seq = vector<unsigned>{0, 2, 1, 3};
                     return;
 
+                case 2:
+                    seq = vector<unsigned>{0, 4, 2, 6, 1, 5, 3, 7};
+                    return;
+
                 default:
                 {
                     vector<unsigned> par(N_reduced, 0);
