@@ -94,21 +94,35 @@ class BigInteger
 
         // Assignment Operator
         BigInteger& operator = (const BigInteger &);
+        BigInteger& operator = (const long long &);
         BigInteger& operator += (const BigInteger &);
+        BigInteger& operator += (const long long &);
         BigInteger& operator -= (const BigInteger &);
+        BigInteger& operator -= (const long long &);
         BigInteger& operator *= (const BigInteger &);
+        BigInteger& operator *= (const long long &);
         BigInteger& operator /= (const BigInteger &);
+        BigInteger& operator /= (const long long &);
         BigInteger& operator %= (const BigInteger &);
+        BigInteger& operator %= (const long long &);
 
         // Arithmetic Operator (friend)
         BigInteger operator -() const;
-        friend BigInteger operator+(BigInteger, const BigInteger &);
-        friend BigInteger operator+(BigInteger, const int &);
-        friend BigInteger operator+(int, const BigInteger &);
-        friend BigInteger operator-(BigInteger,  const BigInteger &);
+        friend BigInteger operator + (BigInteger, const BigInteger &);
+        friend BigInteger operator + (BigInteger, const long long &);
+        friend BigInteger operator + (long long, const BigInteger &);
+        friend BigInteger operator - (BigInteger,  const BigInteger &);
+        friend BigInteger operator - (BigInteger,  const long long &);
+        friend BigInteger operator - (long long,  const BigInteger &);
         friend BigInteger operator * (BigInteger, const BigInteger &);
+        friend BigInteger operator * (BigInteger, const long long &);
+        friend BigInteger operator * (long long, const BigInteger &);
         friend BigInteger operator / (BigInteger, const BigInteger &);
+        friend BigInteger operator / (BigInteger, const long long &);
+        friend BigInteger operator / (long long, const BigInteger &);
         friend BigInteger operator % (BigInteger, const BigInteger &);
+        friend BigInteger operator % (BigInteger, const long long &);
+        friend BigInteger operator % (long long, const BigInteger &);
 
         // Streaming Operator (friend)
         void print(ostream &) const;
@@ -121,21 +135,41 @@ istream& operator >> (istream &, BigInteger &);
 ostream& operator << (ostream &, const BigInteger &);
 
 // Arithmetic Operator
-BigInteger operator+(BigInteger, const BigInteger &);
-BigInteger operator+(BigInteger, const int &);
-BigInteger operator+(int, const BigInteger &);
-BigInteger operator-(BigInteger, const BigInteger &);
+BigInteger operator + (BigInteger, const BigInteger &);
+BigInteger operator + (BigInteger, const long long &);
+BigInteger operator + (long long, const BigInteger &);
+BigInteger operator - (BigInteger, const BigInteger &);
+BigInteger operator - (BigInteger, const long long &);
+BigInteger operator - (long long, const BigInteger &);
 BigInteger operator * (BigInteger, const BigInteger &);
+BigInteger operator * (BigInteger, const long long &);
+BigInteger operator * (long long, const BigInteger &);
 BigInteger operator / (BigInteger, const BigInteger &);
+BigInteger operator / (BigInteger, const long long &);
+BigInteger operator / (long long, const BigInteger &);
 BigInteger operator % (BigInteger, const BigInteger &);
+BigInteger operator % (BigInteger, const long long &);
+BigInteger operator % (long long, const BigInteger &);
 
 // Comparison Operator
 bool operator == (const BigInteger &, const BigInteger &);
+bool operator == (const BigInteger &, const long long &);
+bool operator == (const long long &, const BigInteger &);
 bool operator != (const BigInteger &, const BigInteger &);
+bool operator != (const BigInteger &, const long long &);
+bool operator != (const long long &, const BigInteger &);
 bool operator > (const BigInteger &, const BigInteger &);
+bool operator > (const BigInteger &, const long long &);
+bool operator > (const long long &, const BigInteger &);
 bool operator < (const BigInteger &, const BigInteger &);
+bool operator < (const BigInteger &, const long long &);
+bool operator < (const long long &, const BigInteger &);
 bool operator >= (const BigInteger &, const BigInteger &);
+bool operator >= (const BigInteger &, const long long &);
+bool operator >= (const long long &, const BigInteger &);
 bool operator <= (const BigInteger &, const BigInteger &);
+bool operator <= (const BigInteger &, const long long &);
+bool operator <= (const long long &, const BigInteger &);
 
 // Math Functions
 BigInteger abs(const BigInteger &);

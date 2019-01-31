@@ -1,7 +1,6 @@
 #include <string>
 #include <sstream>
 #include <cmath>
-#include <iostream>
 #include "../include/utility.h"
 #include "../include/define.h"
 
@@ -11,10 +10,8 @@ bool feagure_string_valid_check(string &s)
 {
     int len = s.length();
 
-    if (len == 0) {
-        cout << "I am here" << endl;
+    if (len == 0)
         return false;
-    }
 
     if (len == 1)
     {

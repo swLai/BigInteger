@@ -496,6 +496,10 @@ BigInteger BigInteger::operator -() const
 
 BigInteger operator + (BigInteger lhs, const BigInteger &rhs)
 {
+    BigInteger zero = ZERO;
+    if (lhs == zero) return rhs;
+    if (rhs == zero) return lhs;
+
     if (abs(lhs) == abs(rhs))
     {
         if (lhs.is_neg() != rhs.is_neg())
@@ -519,21 +523,29 @@ BigInteger operator + (BigInteger lhs, const BigInteger &rhs)
     }
 }
 
-BigInteger operator+(BigInteger bi, const int &x)
+BigInteger operator+(BigInteger bi, const long long &x)
 {
-    if (x == 0) return bi;
     return bi + BigInteger(x);
 }
 
-BigInteger operator+(int x, const BigInteger &bi)
+BigInteger operator+(long long x, const BigInteger &bi)
 {
-    if (x == 0) return bi;
     return bi + BigInteger(x);
 }
 
 BigInteger operator - (BigInteger lhs, const BigInteger &rhs)
 {
     return lhs + (-rhs);
+}
+
+BigInteger operator - (BigInteger bi,  const long long &x)
+{
+    return bi + BigInteger(x);
+}
+
+BigInteger operator - (long long x,  const BigInteger &bi)
+{
+    return bi + BigInteger(x);
 }
 
 BigInteger operator * (BigInteger lhs, const BigInteger &rhs)
@@ -556,6 +568,16 @@ BigInteger operator * (BigInteger lhs, const BigInteger &rhs)
     );
 }
 
+BigInteger operator * (BigInteger bi,  const long long &x)
+{
+    return bi * BigInteger(x);
+}
+
+BigInteger operator * (long long x,  const BigInteger &bi)
+{
+    return bi * BigInteger(x);
+}
+
 BigInteger operator / (BigInteger lhs, const BigInteger &rhs)
 {
     BigInteger zero = ZERO, one  = ONE, min_one = MIN_ONE;
@@ -576,9 +598,29 @@ BigInteger operator / (BigInteger lhs, const BigInteger &rhs)
     );
 }
 
+BigInteger operator / (BigInteger bi,  const long long &x)
+{
+    return bi / BigInteger(x);
+}
+
+BigInteger operator / (long long x,  const BigInteger &bi)
+{
+    return BigInteger(x) / bi;
+}
+
 BigInteger operator % (BigInteger lhs, const BigInteger &rhs)
 {
     return lhs - (lhs / rhs) * rhs;
+}
+
+BigInteger operator % (BigInteger bi,  const long long &x)
+{
+    return bi % BigInteger(x);
+}
+
+BigInteger operator % (long long x,  const BigInteger &bi)
+{
+    return BigInteger(x) % bi;
 }
 
 /*
@@ -632,8 +674,44 @@ bool operator == (const BigInteger &lhs, const BigInteger &rhs)
         return false;
 }
 
+bool operator == (const BigInteger &lhs, const long long &x)
+{
+    BigInteger rhs(x);
+    if (lhs == rhs)
+        return true;
+    else
+        return false;
+}
+
+bool operator == (const long long &x, const BigInteger &rhs)
+{
+    BigInteger lhs(x);
+    if (lhs == rhs)
+        return true;
+    else
+        return false;
+}
+
 bool operator != (const BigInteger &lhs, const BigInteger &rhs)
 {
+    if (lhs == rhs)
+        return false;
+    else
+        return true;
+}
+
+bool operator != (const BigInteger &lhs, const long long &x)
+{
+    BigInteger rhs(x);
+    if (lhs == rhs)
+        return false;
+    else
+        return true;
+}
+
+bool operator != (const long long &x, const BigInteger &rhs)
+{
+    BigInteger lhs(x);
     if (lhs == rhs)
         return false;
     else
@@ -671,8 +749,44 @@ bool operator > (const BigInteger &lhs, const BigInteger &rhs)
     }
 }
 
+bool operator > (const BigInteger &lhs, const long long &x)
+{
+    BigInteger rhs(x);
+    if (lhs > rhs)
+        return true;
+    else
+        return false;
+}
+
+bool operator > (const long long &x, const BigInteger &rhs)
+{
+    BigInteger lhs(x);
+    if (lhs > rhs)
+        return true;
+    else
+        return false;
+}
+
 bool operator <= (const BigInteger &lhs, const BigInteger &rhs)
 {
+    if (lhs > rhs)
+        return false;
+    else
+        return true;
+}
+
+bool operator <= (const BigInteger &lhs, const long long &x)
+{
+    BigInteger rhs(x);
+    if (lhs > rhs)
+        return false;
+    else
+        return true;
+}
+
+bool operator <= (const long long &x, const BigInteger &rhs)
+{
+    BigInteger lhs(x);
     if (lhs > rhs)
         return false;
     else
@@ -687,8 +801,44 @@ bool operator >= (const BigInteger &lhs, const BigInteger &rhs)
         return false;
 }
 
+bool operator >= (const BigInteger &lhs, const long long &x)
+{
+    BigInteger rhs(x);
+    if (lhs == rhs || lhs > rhs)
+        return true;
+    else
+        return false;
+}
+
+bool operator >= (const long long &x, const BigInteger &rhs)
+{
+    BigInteger lhs(x);
+    if (lhs == rhs || lhs > rhs)
+        return true;
+    else
+        return false;
+}
+
 bool operator < (const BigInteger &lhs, const BigInteger &rhs)
 {
+    if (lhs >= rhs )
+        return false;
+    else
+        return true;
+}
+
+bool operator < (const BigInteger &lhs, const long long &x)
+{
+    BigInteger rhs(x);
+    if (lhs >= rhs )
+        return false;
+    else
+        return true;
+}
+
+bool operator < (const long long &x, const BigInteger &rhs)
+{
+    BigInteger lhs(x);
     if (lhs >= rhs )
         return false;
     else
@@ -698,11 +848,17 @@ bool operator < (const BigInteger &lhs, const BigInteger &rhs)
 /*
     Assignment Operator
 */
-BigInteger& BigInteger::operator=(const BigInteger &rhs)
+BigInteger& BigInteger::operator = (const BigInteger &rhs)
 {
     this->words = rhs.get_words();
     this->zeros_ahead = rhs.get_zeros_ahead();
     this->sign = rhs.is_neg();
+    return *this;
+}
+
+BigInteger& BigInteger::operator = (const long long &x)
+{
+    *this = BigInteger(x);
     return *this;
 }
 
@@ -712,9 +868,21 @@ BigInteger& BigInteger::operator += (const BigInteger &rhs)
     return *this;
 }
 
+BigInteger& BigInteger::operator += (const long long &x)
+{
+    *this = *this + BigInteger(x);
+    return *this;
+}
+
 BigInteger& BigInteger::operator -= (const BigInteger &rhs)
 {
     *this = *this - rhs;
+    return *this;
+}
+
+BigInteger& BigInteger::operator -= (const long long &x)
+{
+    *this = *this - BigInteger(x);
     return *this;
 }
 
@@ -724,15 +892,33 @@ BigInteger& BigInteger::operator *= (const BigInteger &rhs)
     return *this;
 }
 
+BigInteger& BigInteger::operator *= (const long long &x)
+{
+    *this = *this * BigInteger(x);
+    return *this;
+}
+
 BigInteger& BigInteger::operator /= (const BigInteger &rhs)
 {
     *this = *this / rhs;
     return *this;
 }
 
+BigInteger& BigInteger::operator /= (const long long &x)
+{
+    *this = *this / BigInteger(x);
+    return *this;
+}
+
 BigInteger& BigInteger::operator %= (const BigInteger &rhs)
 {
     *this = *this % rhs;
+    return *this;
+}
+
+BigInteger& BigInteger::operator %= (const long long &x)
+{
+    *this = *this % BigInteger(x);
     return *this;
 }
 
