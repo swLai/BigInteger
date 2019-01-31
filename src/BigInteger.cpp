@@ -121,8 +121,19 @@ BigInteger::BigInteger(const BigInteger &bi, bool sign)
 BigInteger::BigInteger(const BigInteger &bi, int pow, unsigned base)
 {
     BigInteger zero = ZERO;
-    if (bi == zero || static_cast<int>(bi.get_digits()) + pow <= 0) *this = zero;
-    if (pow == 0) *this = bi;
+
+
+    if (bi == zero || (static_cast<int>(bi.get_digits()) + pow) <= 0)
+    {
+        *this = zero;
+        return;
+    }
+
+    if (pow == 0)
+    {
+        *this = bi;
+        return;
+    }
 
     if (base == 10)
     {
@@ -171,6 +182,22 @@ istream& operator >> (istream &in, BigInteger &bi)
 /*
     Arithmetic Operator
 */
+static BigInteger shift_10r2p(const BigInteger &bi, int pow, unsigned base = 10)
+{
+    return BigInteger(bi, pow, base);
+}
+
+static BigInteger rem_10r2p(const BigInteger &bi, int pow, unsigned base = 10)
+{
+    BigInteger zero = ZERO;
+    unsigned pow_abs = abs(pow);
+    if (bi == zero) return zero;
+    if (bi.get_digits() <= pow_abs) return bi;
+    BigInteger q_10_nPow = shift_10r2p(bi, -pow_abs, base);
+    BigInteger q_10_pPow = shift_10r2p(q_10_nPow, pow_abs, base);
+    return bi - q_10_pPow;
+}
+
 static BigInteger add(const BigInteger &lhs, const BigInteger &rhs)
 {
     BigInteger result = lhs;
@@ -286,22 +313,7 @@ static BigInteger subtract(const BigInteger &lhs, const BigInteger &rhs)
     return result;
 }
 
-static BigInteger shift_10r2p(const BigInteger &bi, int pow, unsigned base = 10)
-{
-    return BigInteger(bi, pow, base);
-}
-
-static BigInteger rem_10r2p(const BigInteger &bi, int pow, unsigned base = 10)
-{
-    BigInteger zero = ZERO;
-    unsigned pow_abs = abs(pow);
-    if (bi == zero) return zero;
-    if (bi.get_digits() <= pow_abs) return bi;
-    BigInteger q_10_nPow = shift_10r2p(bi, -pow_abs, base);
-    BigInteger q_10_pPow = shift_10r2p(q_10_nPow, pow_abs, base);
-    return bi - q_10_pPow;
-}
-
+#if MULTIPLY == KARATSUBA
 static BigInteger multiply_karatsuba(const BigInteger &lhs, const BigInteger &rhs)
 {
     BigInteger zero = ZERO;
@@ -314,27 +326,23 @@ static BigInteger multiply_karatsuba(const BigInteger &lhs, const BigInteger &rh
         return zero;
     else if (n <= SECTION_LEN)
     {
-        BigInteger result;
-        unsigned l = lhs.get_words(0);
-        unsigned r = rhs.get_words(0);
-        stringstream ss;
-        string s;
-        ss << (unsigned long long) l * r;
-        ss >> result;
-        return result;
+        long long l = lhs.get_words(0);
+        long long r = rhs.get_words(0);
+        return BigInteger(l * r);
     }
     else
     {
         m  = floor(n / 2);
         a1 = shift_10r2p(lhs, -m); a0 = rem_10r2p(lhs, m);
-        b1 = shift_10r2p(rhs, -m); b0 = rem_10r2p(rhs, m);
+        b1 = shift_10r2p(rhs, -m);
+        b0 = rem_10r2p(rhs, m);
         r = multiply_karatsuba(a1 + a0, b1 + b0);
         p = multiply_karatsuba(a1, b1);
         q = multiply_karatsuba(a0, b0);
         return shift_10r2p(p, 2*m) + shift_10r2p(r - p - q, m) + q;
     }
 }
-
+#else
 static void fft(vector<complex_t> &X, bool invert = false)
 {
 	unsigned n = X.size();
@@ -419,11 +427,19 @@ static BigInteger multiply_fft(const BigInteger &lhs, const BigInteger &rhs)
     } while ( i < R_len || word_64 );
 	return result;
 }
+#endif // MULTIPLY
 
-static BigInteger divide_iteration(const BigInteger &dividend, const BigInteger &divisor, const BigInteger &zero)
+static BigInteger divide_iteration(const BigInteger &dividend, const BigInteger &divisor)
 {
     BigInteger quo;
     unsigned divisor_words_len = divisor.get_words_len();
+#if MULTIPLY == KARATSUBA
+    unsigned long long divisor_leadings = (divisor_words_len > 1 ?
+        static_cast<unsigned long long>(divisor.get_words(divisor_words_len - 1)) * BASE +
+            divisor.get_words(divisor_words_len - 2) :
+        static_cast<unsigned long long>(divisor.get_words(divisor_words_len - 1)));
+    unsigned divisor_leadings_len = divisor_words_len > 1 ? 2 : 1;
+#else
     unsigned long long divisor_leadings = (divisor_words_len > 2 ?
         static_cast<unsigned long long>(divisor.get_words(divisor_words_len - 1)) * BASE_SQR +
             static_cast<unsigned long long>(divisor.get_words(divisor_words_len - 2)) * BASE +
@@ -433,11 +449,19 @@ static BigInteger divide_iteration(const BigInteger &dividend, const BigInteger 
                 divisor.get_words(divisor_words_len - 2) :
             static_cast<unsigned long long>(divisor.get_words(divisor_words_len - 1)));
     unsigned divisor_leadings_len = divisor_words_len > 2 ? 3 : divisor_words_len > 1 ? 2 : 1;
+#endif // MULTIPLY
 
     BigInteger rem_k(dividend), quo_k;
     while (rem_k >= divisor)
     {
         unsigned rem_k_words_len = rem_k.get_words_len();
+#if MULTIPLY == KARATSUBA
+        unsigned long long rem_k_leadings = (rem_k_words_len > 1 ?
+            static_cast<unsigned long long>(rem_k.get_words(rem_k_words_len - 1)) * BASE +
+                rem_k.get_words(rem_k_words_len - 2) :
+            static_cast<unsigned long long>(rem_k.get_words(rem_k_words_len - 1)));
+        unsigned rem_k_leadings_len = rem_k_words_len > 1 ? 2 : 1;
+#else
         unsigned long long rem_k_leadings = (rem_k_words_len > 2 ?
             static_cast<unsigned long long>(rem_k.get_words(rem_k_words_len - 1)) * BASE_SQR +
                 static_cast<unsigned long long>(rem_k.get_words(rem_k_words_len - 2)) * BASE +
@@ -447,6 +471,7 @@ static BigInteger divide_iteration(const BigInteger &dividend, const BigInteger 
                     rem_k.get_words(rem_k_words_len - 2) :
                 static_cast<unsigned long long>(rem_k.get_words(rem_k_words_len - 1)));
         unsigned rem_k_leadings_len = rem_k_words_len > 2 ? 3 : rem_k_words_len > 1 ? 2 : 1;
+#endif // MULTIPLY
         unsigned words_len_diff = rem_k_words_len - divisor_words_len - rem_k_leadings_len + divisor_leadings_len;
         double head =  static_cast<double>(rem_k_leadings) / divisor_leadings;
 
@@ -522,7 +547,11 @@ BigInteger operator * (BigInteger lhs, const BigInteger &rhs)
     if (rhs == min_one) return -lhs;
 
     return BigInteger(
-        multiply_fft(lhs, rhs), // multiply_karatsuba(lhs, rhs),
+#if MULTIPLY == KARATSUBA
+        multiply_karatsuba(lhs, rhs),
+#else
+        multiply_fft(lhs, rhs),
+#endif
         lhs.is_neg() ^ rhs.is_neg()
     );
 }
@@ -542,7 +571,7 @@ BigInteger operator / (BigInteger lhs, const BigInteger &rhs)
     if (rhs == min_one) return -lhs;
 
     return BigInteger(
-        divide_iteration(lhs, rhs, zero),
+        divide_iteration(lhs, rhs),
         lhs.is_neg() ^ rhs.is_neg()
     );
 }
