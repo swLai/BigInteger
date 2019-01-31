@@ -540,12 +540,12 @@ BigInteger operator - (BigInteger lhs, const BigInteger &rhs)
 
 BigInteger operator - (BigInteger bi,  const long long &x)
 {
-    return bi + BigInteger(x);
+    return bi - BigInteger(x);
 }
 
 BigInteger operator - (long long x,  const BigInteger &bi)
 {
-    return bi + BigInteger(x);
+    return bi - BigInteger(x);
 }
 
 BigInteger operator * (BigInteger lhs, const BigInteger &rhs)
