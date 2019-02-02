@@ -401,8 +401,8 @@ static void fft(vector<complex_t> &X, bool invert = false)
             {
                 complex_t tmp = X[ i + j + m] * w;
                 X[ i + j + m ] = X[ i + j ] - tmp;
-				X[ i + j ] += tmp;
-				w = w * wlen;
+                X[ i + j ] += tmp;
+                w = w * wlen;
             }
         }
     }
