@@ -10,7 +10,7 @@ Feal free to customize your own version, or pull a feature request to let me kno
 
 ## Prerequisites
 
-Place the ./src and ./include documents inside your project directory and include the BigInteger.h file in your *.cpp
+Place the `./src` and `./include` documents inside your project directory and include the `BigInteger.h` file in your `*.cpp`
 
 ```
 #include "./include/BigInteger.h"
@@ -51,7 +51,7 @@ The following picture demonstrates the performance of using the BigInteger class
 
 Note 1: The results are obtained from ./demo.cpp
 
-Note 2: The FFT/KARATSUBA label below each panel is the indication of the "MULTIPLY" setting defined in .\include\define.h
+Note 2: The FFT/KARATSUBA label below each panel is the indication of the "MULTIPLY" setting defined in `.\include\define.h`
 
 ## Author
 
