@@ -50,6 +50,7 @@ The following picture demonstrates the performance of using the BigInteger class
 </p>
 
 Note 1: The results are obtained from ./demo.cpp
+
 Note 2: The FFT/KARATSUBA label below each panel is the indication of the "MULTIPLY" setting defined in .\include\define.h
 
 ## Author
