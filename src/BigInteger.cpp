@@ -390,27 +390,27 @@ static void fft(vector<complex_t> &X, bool invert = false)
     Pair(n).tidy_that(X);
 
     double _signed_2_pi_ = (invert ? -1 : 1) * 2 * acos(-1);
-	for (unsigned len = 2; len <= n; len <<= 1)
+    for (unsigned len = 2; len <= n; len <<= 1)
     {
         unsigned m = len >> 1;
         double theta = _signed_2_pi_ / len;
-		complex_t wlen (cos(theta), sin(theta));
-		for (unsigned i = 0; i < n; i += len)
+        complex_t wlen (cos(theta), sin(theta));
+        for (unsigned i = 0; i < n; i += len)
         {
             complex_t w (1);
-			for (unsigned j = 0; j < m; ++j)
+            for (unsigned j = 0; j < m; ++j)
             {
                 complex_t tmp = X[ i + j + m] * w;
-				X[ i + j + m ] = X[ i + j ] - tmp;
+                X[ i + j + m ] = X[ i + j ] - tmp;
 				X[ i + j ] += tmp;
-                w = w * wlen;
-			}
+				w = w * wlen;
+            }
 		}
-	}
+    }
 
-	if (invert)
-		for (auto &ele : X)
-			ele /= n;
+    if (invert)
+        for (auto &ele : X)
+            ele /= n;
 }
 
 static BigInteger multiply_fft(const BigInteger &lhs, const BigInteger &rhs)
@@ -431,21 +431,21 @@ static BigInteger multiply_fft(const BigInteger &lhs, const BigInteger &rhs)
     fft(Z);
 
     vector<complex_t> R(n, 0);
-	for(unsigned i = 1; i < n; ++i)
-	{
-		double x_real = Z[i].real(), x_imag = Z[i].imag();
-		double y_real = Z[n - i].real(), y_imag = Z[n - i].imag();
-		complex_t LHS_i = complex_t{ (x_real + y_real) / 2, (x_imag - y_imag) / 2 };
-		complex_t RHS_i = complex_t{ (x_imag + y_imag) / 2, -(x_real - y_real) / 2 };
-		R[i] = LHS_i * RHS_i;
-	}
-	R[0] = Z[0].imag() * Z[0].real();
+    for(unsigned i = 1; i < n; ++i)
+    {
+        double x_real = Z[i].real(), x_imag = Z[i].imag();
+        double y_real = Z[n - i].real(), y_imag = Z[n - i].imag();
+        complex_t LHS_i = complex_t{ (x_real + y_real) / 2, (x_imag - y_imag) / 2 };
+        complex_t RHS_i = complex_t{ (x_imag + y_imag) / 2, -(x_real - y_real) / 2 };
+        R[i] = LHS_i * RHS_i;
+    }
+    R[0] = Z[0].imag() * Z[0].real();
 
-	fft(R, true);
+    fft(R, true);
 
-	unsigned R_len = n-1;
-	while ( static_cast<unsigned long long>(R[R_len].real() + 0.5) == 0 && R_len > 0 ) --R_len;
-	++R_len;
+    unsigned R_len = n-1;
+    while ( static_cast<unsigned long long>(R[R_len].real() + 0.5) == 0 && R_len > 0 ) --R_len;
+    ++R_len;
 
     BigInteger result;
     unsigned long long word_64 = 0;
@@ -466,7 +466,7 @@ static BigInteger multiply_fft(const BigInteger &lhs, const BigInteger &rhs)
         }
         ++i;
     } while ( i < R_len || word_64 );
-	return result;
+    return result;
 }
 #endif // MULTIPLY
 
@@ -565,12 +565,12 @@ BigInteger operator + (BigInteger lhs, const BigInteger &rhs)
     }
 }
 
-BigInteger operator+(BigInteger bi, const long long &x)
+BigInteger operator + (BigInteger bi, const long long &x)
 {
     return bi + BigInteger(x);
 }
 
-BigInteger operator+(long long x, const BigInteger &bi)
+BigInteger operator + (long long x, const BigInteger &bi)
 {
     return bi + BigInteger(x);
 }

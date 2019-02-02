@@ -100,12 +100,6 @@ void generate_shifting_ele(unsigned pow, unsigned &multiplier, unsigned &divisor
             divisor = 100000000;
             return;
         default:
-            divisor = 1;
-            while (pow--)
-            {
-                divisor *= 10;
-            }
-            multiplier = BASE / divisor;
             return;
     }
 }
