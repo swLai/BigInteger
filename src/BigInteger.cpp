@@ -7,7 +7,6 @@
 #include "../include/BigInteger.h"
 #include "../include/define.h"
 #include "../include/utility.h"
-#include "../include/pair.h"
 
 #ifndef ZERO
     #define ZERO                 BigInteger(0)
@@ -388,7 +387,12 @@ static BigInteger multiply_karatsuba(const BigInteger &lhs, const BigInteger &rh
 static void fft(vector<complex_t> &X, bool invert = false)
 {
     unsigned n = X.size();
-    Pair(n).tidy_that(X);
+	for (int i = 1, j = 0; i < n; ++i) {
+		int bit = n >> 1;
+		for (; j >= bit; bit >>= 1) j -= bit;
+		j += bit;
+		if (i < j) swap(X[i], X[j]);
+	}
 
     double _signed_2_pi_ = (invert ? -1 : 1) * 2 * acos(-1);
     for (unsigned len = 2; len <= n; len <<= 1)
@@ -473,7 +477,6 @@ static BigInteger multiply_fft(const BigInteger &lhs, const BigInteger &rhs)
 
 static BigInteger divide_iteration(const BigInteger &dividend, const BigInteger &divisor)
 {
-    BigInteger quo;
     unsigned divisor_words_len = divisor.get_words_len();
 #if MULTIPLY == KARATSUBA
     unsigned long long divisor_leadings = (divisor_words_len > 1 ?
@@ -494,7 +497,7 @@ static BigInteger divide_iteration(const BigInteger &dividend, const BigInteger 
 #endif // MULTIPLY
 
     BigInteger divisor_abs(abs(divisor));
-    BigInteger rem_k(abs(dividend)), quo_k;
+    BigInteger rem_k(abs(dividend)), quo;
     while (rem_k >= divisor_abs)
     {
         unsigned rem_k_words_len = rem_k.get_words_len();
@@ -524,9 +527,9 @@ static BigInteger divide_iteration(const BigInteger &dividend, const BigInteger 
             --words_len_diff;
         }
 
-        quo_k = shift_10r2p(BigInteger(static_cast<unsigned long long>(head)), words_len_diff * SECTION_LEN);
-        rem_k -= quo_k * divisor;
-        quo += quo_k;
+        BigInteger dummy = BigInteger(static_cast<unsigned long long>(head));
+        rem_k -= shift_10r2p(divisor * dummy, words_len_diff * SECTION_LEN);
+        quo   += shift_10r2p(dummy, words_len_diff * SECTION_LEN);
     }
 
     return quo;
