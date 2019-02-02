@@ -3,7 +3,7 @@
 
 #define KARATSUBA               0
 #define FFT                     1
-#define MULTIPLY                KARATSUBA
+#define MULTIPLY                FFT
 
 #define ZERO_9_APX             "000000000"
 #define ZERO_8_APX             "00000000"

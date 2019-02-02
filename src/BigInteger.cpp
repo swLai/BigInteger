@@ -9,13 +9,15 @@
 #include "../include/utility.h"
 
 #ifndef ZERO
-    #define ZERO                 BigInteger(0)
+#define ZERO                 BigInteger(0)
 #endif // ZERO
+
 #ifndef ONE
-    #define ONE                  BigInteger(1)
+#define ONE                  BigInteger(1)
 #endif // ONE
+
 #ifndef MIN_ONE
-    #define MIN_ONE              BigInteger(-1)
+#define MIN_ONE              BigInteger(-1)
 #endif // MIN_ONE
 
 using namespace std;
@@ -73,13 +75,14 @@ BigInteger::BigInteger(string init_str)
     set_sign(false);
     switch (init_str[0])
     {
-        case '-': set_sign(true);
-        case '+':
-            init_str.erase(0, 1); // erase the sign character
-            break;
+    case '-':
+        set_sign(true);
+    case '+':
+        init_str.erase(0, 1); // erase the sign character
+        break;
 
-        default:
-            ;
+    default:
+        ;
     }
 
     int len = init_str.length();
@@ -130,7 +133,8 @@ BigInteger::BigInteger(const BigInteger &bi, int pow, unsigned base)
     }
 
     *this = bi;
-    if (pow == 0) return;
+    if (pow == 0)
+        return;
 
     if (base == 10)
     {
@@ -200,7 +204,9 @@ BigInteger::BigInteger(const BigInteger &bi, int pow, unsigned base)
 */
 void BigInteger::print(ostream &out) const
 {
-    if (is_neg()) out << "-";
+    if (is_neg())
+        out << "-";
+
     int words = get_words_len();
     out << get_words(words - 1);
     for (int pos = words - 2; pos > -1; --pos)
@@ -233,8 +239,13 @@ static BigInteger rem_10r2p(const BigInteger &bi, int pow, unsigned base = 10)
 {
     BigInteger zero = ZERO;
     unsigned pow_abs = abs(pow);
-    if (bi == zero) return zero;
-    if (bi.get_digits() <= pow_abs) return bi;
+
+    if (bi == zero)
+        return zero;
+
+    if (bi.get_digits() <= pow_abs)
+        return bi;
+
     BigInteger q_10_nPow = shift_10r2p(bi, -pow_abs, base);
     BigInteger q_10_pPow = shift_10r2p(q_10_nPow, pow_abs, base);
     return bi - q_10_pPow;
@@ -375,8 +386,10 @@ static BigInteger multiply_karatsuba(const BigInteger &lhs, const BigInteger &rh
         BigInteger a0, a1, b0, b1;
         BigInteger r, p, q;
         unsigned m  = floor(n / 2);
-        a1 = shift_10r2p(lhs, -m); a0 = rem_10r2p(lhs, m);
-        b1 = shift_10r2p(rhs, -m); b0 = rem_10r2p(rhs, m);
+        a1 = shift_10r2p(lhs, -m);
+        a0 = rem_10r2p(lhs, m);
+        b1 = shift_10r2p(rhs, -m);
+        b0 = rem_10r2p(rhs, m);
         r = multiply_karatsuba(a1 + a0, b1 + b0);
         p = multiply_karatsuba(a1, b1);
         q = multiply_karatsuba(a0, b0);
@@ -387,12 +400,15 @@ static BigInteger multiply_karatsuba(const BigInteger &lhs, const BigInteger &rh
 static void fft(vector<complex_t> &X, bool invert = false)
 {
     unsigned n = X.size();
-	for (int i = 1, j = 0; i < n; ++i) {
-		int bit = n >> 1;
-		for (; j >= bit; bit >>= 1) j -= bit;
-		j += bit;
-		if (i < j) swap(X[i], X[j]);
-	}
+    for (unsigned i = 1, j = 0; i < n; ++i)
+    {
+        unsigned bit = n >> 1;
+        for (; j >= bit; bit >>= 1)
+            j -= bit;
+        j += bit;
+        if (i < j)
+            swap(X[i], X[j]);
+    }
 
     double _signed_2_pi_ = (invert ? -1 : 1) * 2 * acos(-1);
     for (unsigned len = 2; len <= n; len <<= 1)
@@ -427,7 +443,8 @@ static BigInteger multiply_fft(const BigInteger &lhs, const BigInteger &rhs)
     vector<complex_t> Z(n, 0);
     for (unsigned i = 0; i < n; ++i)
     {
-        Z[i] = complex_t {
+        Z[i] = complex_t
+        {
             i < lhs_words_len ? lhs.get_words(i) : 0,
             i < rhs_words_len ? rhs.get_words(i) : 0
         };
@@ -449,14 +466,18 @@ static BigInteger multiply_fft(const BigInteger &lhs, const BigInteger &rhs)
     fft(R, true);
 
     unsigned R_len = n-1;
-    while ( static_cast<unsigned long long>(R[R_len].real() + 0.5) == 0 && R_len > 0 ) --R_len;
+    while ( static_cast<unsigned long long>(R[R_len].real() + 0.5) == 0 && R_len > 0 )
+        --R_len;
     ++R_len;
 
     BigInteger result;
     unsigned long long word_64 = 0;
     unsigned word, i = 0;
-    do {
-        if (i < R_len) word_64 += static_cast<unsigned long long>(R[i].real() + 0.5);
+    do
+    {
+        if (i < R_len)
+            word_64 += static_cast<unsigned long long>(R[i].real() + 0.5);
+
         if (word_64)
         {
             word = word_64 % BASE;
@@ -469,8 +490,10 @@ static BigInteger multiply_fft(const BigInteger &lhs, const BigInteger &rhs)
             result.set_word(0, i);
             result.set_zeros_ahead(SECTION_LEN-1, i);
         }
+
         ++i;
-    } while ( i < R_len || word_64 );
+    }
+    while ( i < R_len || word_64 );
     return result;
 }
 #endif // MULTIPLY
@@ -543,8 +566,12 @@ BigInteger BigInteger::operator -() const
 BigInteger operator + (BigInteger lhs, const BigInteger &rhs)
 {
     BigInteger zero = ZERO;
-    if (lhs == zero) return rhs;
-    if (rhs == zero) return lhs;
+
+    if (lhs == zero)
+        return rhs;
+
+    if (rhs == zero)
+        return lhs;
 
     if (abs(lhs) == abs(rhs))
     {
@@ -598,11 +625,20 @@ BigInteger operator * (BigInteger lhs, const BigInteger &rhs)
 {
     BigInteger zero = ZERO, one = ONE, min_one = MIN_ONE;
 
-    if (lhs == zero || rhs == zero) return zero;
-    if (lhs == one) return rhs;
-    if (lhs == min_one) return -rhs;
-    if (rhs == one) return lhs;
-    if (rhs == min_one) return -lhs;
+    if (lhs == zero || rhs == zero)
+        return zero;
+
+    if (lhs == one)
+        return rhs;
+
+    if (lhs == min_one)
+        return -rhs;
+
+    if (rhs == one)
+        return lhs;
+
+    if (rhs == min_one)
+        return -lhs;
 
     return BigInteger(
 #if MULTIPLY == KARATSUBA
@@ -628,15 +664,25 @@ BigInteger operator / (BigInteger lhs, const BigInteger &rhs)
 {
     BigInteger zero = ZERO, one  = ONE, min_one = MIN_ONE;
 
-    if (lhs < rhs) return zero;
+    if (lhs < rhs)
+        return zero;
+
     if (abs(lhs) == abs(rhs))
     {
-        if (lhs.is_neg() == rhs.is_neg()) return one;
-        else return min_one;
+        if (lhs.is_neg() == rhs.is_neg())
+            return one;
+        else
+            return min_one;
     }
-    if (lhs == zero || rhs == zero) return zero;  // including error, divisor cannot be zero in division
-    if (rhs == one) return lhs;
-    if (rhs == min_one) return -lhs;
+
+    if (lhs == zero || rhs == zero)
+        return zero;  // including error, divisor cannot be zero in division
+
+    if (rhs == one)
+        return lhs;
+
+    if (rhs == min_one)
+        return -lhs;
 
     return BigInteger(
         divide_iteration(lhs, rhs),
@@ -714,9 +760,11 @@ bool operator == (const BigInteger &lhs, const BigInteger &rhs)
                     return false;
             }
             return true;
-        } else
+        }
+        else
             return false;
-    } else
+    }
+    else
         return false;
 }
 
@@ -793,6 +841,8 @@ bool operator > (const BigInteger &lhs, const BigInteger &rhs)
             }
         }
     }
+
+    return false;
 }
 
 bool operator > (const BigInteger &lhs, const long long &x)
