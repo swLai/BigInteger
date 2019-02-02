@@ -1,4 +1,4 @@
-# Big Integer Computation [![Build Status](https://travis-ci.org/swLai/BigInteger.svg?branch=master)](https://travis-ci.org/swLai/BigInteger)
+# Big Integer Computation
 
 The class is aimed at easy adoption for big integers computation with medium performance in c++ programming.
 
