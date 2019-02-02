@@ -48,7 +48,7 @@ unsigned find_zeros_ahead(unsigned word)
     unsigned zeros_ahead = 0;
     unsigned filter = BASE / 10;
 
-    while ((filter^0x1) && word < filter)
+    while ((filter ^ 0x1) && word < filter)
     {
         ++zeros_ahead;
         filter /= 10;
