@@ -71,17 +71,19 @@ BigInteger::BigInteger(string init_str)
         return;
     }
 
-    int len = init_str.length();
-    if (init_str[0] != '-' && init_str[0] != '+')
-        set_sign(false);
-    else
+    set_sign(false);
+    switch (init_str[0])
     {
-        if (init_str[0] == '-') set_sign(true);
-        else set_sign(false);
-        init_str.erase(0, 1); // erase the sign character
-        --len;
+        case '-': set_sign(true);
+        case '+':
+            init_str.erase(0, 1); // erase the sign character
+            break;
+
+        default:
+            ;
     }
 
+    int len = init_str.length();
     unsigned words = ceil(static_cast<double>(len) / SECTION_LEN);
     int shift = len;
     string feagures_str, feagure_sec;
