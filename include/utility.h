@@ -1,9 +1,10 @@
 #ifndef UTILITY_H
 #define UTILITY_H
 
+#include <string>
 using namespace std;
 
-bool feagure_string_valid_check(string &);
+bool validate_feagure_string(string &);
 unsigned find_zeros_ahead(unsigned);
 string generate_zeros_str(unsigned);
 void generate_shifting_ele(unsigned, unsigned &, unsigned &);

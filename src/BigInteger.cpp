@@ -62,7 +62,7 @@ BigInteger::BigInteger(long long word)
 
 BigInteger::BigInteger(string init_str)
 {
-    if (!feagure_string_valid_check(init_str))
+    if (!validate_feagure_string(init_str))
     {
         cout << "The value is not a complete integer number!\n" << endl;
         set_word(0, 0);

@@ -1,12 +1,9 @@
-#include <string>
-#include <sstream>
-#include <cmath>
 #include "../include/utility.h"
 #include "../include/define.h"
 
 using namespace std;
 
-bool feagure_string_valid_check(string &s)
+bool validate_feagure_string(string &s)
 {
     int len = s.length();
 
