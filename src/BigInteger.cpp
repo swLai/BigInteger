@@ -36,24 +36,28 @@ BigInteger::BigInteger()
 
 BigInteger::BigInteger(long long word)
 {
-    if (word < 0)
-        set_sign(true);
-    else
-        set_sign(false);
-
-    unsigned word_u = abs(word) % BASE;
-    set_word(word_u, 0);
-    set_zeros_ahead(find_zeros_ahead(word_u), 0);
-    word /= BASE;
-
-    unsigned i = 1;
-    while (word)
+    if (word)
     {
-        unsigned word_u = abs(word) % BASE;
-        word /= BASE;
-        set_word(word_u, i);
-        set_zeros_ahead(find_zeros_ahead(word_u), i);
-        ++i;
+        if (word < 0)
+            set_sign(true);
+        else
+            set_sign(false);
+
+        unsigned i = 0;
+        while (word)
+        {
+            unsigned word_u = abs(word) % BASE;
+            set_word(word_u, i);
+            set_zeros_ahead(find_zeros_ahead(word_u), i);
+            word /= BASE;
+            ++i;
+        }
+    }
+    else
+    {
+        set_word(0, 0);
+        set_zeros_ahead(SECTION_LEN-1, 0);
+        set_sign(false);
     }
 }
 
@@ -106,22 +110,18 @@ BigInteger::BigInteger(string init_str)
 
 BigInteger::BigInteger(const BigInteger &bi)
 {
-    this->words = bi.get_words();
-    this->zeros_ahead = bi.get_zeros_ahead();
-    this->sign = bi.is_neg();
+    *this = bi;
 }
 
 BigInteger::BigInteger(const BigInteger &bi, bool sign)
 {
-    this->words = bi.get_words();
-    this->zeros_ahead = bi.get_zeros_ahead();
+    *this = bi;
     this->sign = sign;
 }
 
 BigInteger::BigInteger(const BigInteger &bi, int pow, unsigned base)
 {
-    BigInteger zero = ZERO;
-
+     BigInteger zero = ZERO;
 
     if (bi == zero || (static_cast<int>(bi.get_digits()) + pow) <= 0)
     {
@@ -129,26 +129,68 @@ BigInteger::BigInteger(const BigInteger &bi, int pow, unsigned base)
         return;
     }
 
-    if (pow == 0)
-    {
-        *this = bi;
-        return;
-    }
+    *this = bi;
+    if (pow == 0) return;
 
     if (base == 10)
     {
-        stringstream ss;
         if (pow > 0)
         {
-            ss << bi << generate_zeros_str(pow);
-            ss >> *this;
+            unsigned multiplier, divisor;
+            generate_shifting_ele(pow % SECTION_LEN, multiplier, divisor);
+
+            unsigned len = this->get_words_len();
+            unsigned upper, lower, residual = 0;
+            for (unsigned i = 0; i < len; ++i)
+            {
+                lower = residual;
+                upper = this->get_words(i) % multiplier;
+                residual = this->get_words(i) / multiplier;
+                this->set_word(upper * divisor + lower, i);
+                this->set_zeros_ahead(find_zeros_ahead(this->get_words(i)), i);
+            }
+
+            if (residual)
+            {
+                this->set_word(residual, len);
+                this->set_zeros_ahead(find_zeros_ahead(residual), len);
+            }
+
+            this->ins_zeros_section(pow / SECTION_LEN);
         }
         else
         {
-            string  feagure_str;
-            ss << bi;
-            ss >> feagure_str;
-            *this = BigInteger(BigInteger(feagure_str.substr(0, feagure_str.size() + pow)), bi.is_neg());
+            unsigned pow_abs = abs(pow);
+            unsigned del_sections = pow_abs / SECTION_LEN;
+            while (del_sections--)
+            {
+                this->del_word(0);
+                this->del_zeros_ahead(0);
+            }
+
+            unsigned multiplier, divisor;
+            generate_shifting_ele(pow_abs % SECTION_LEN, multiplier, divisor);
+            unsigned len = this->get_words_len();
+            unsigned upper, lower, residual = this->get_words(0) / divisor;
+            for (unsigned i = 1; i < len; ++i)
+            {
+                lower = residual;
+                upper = this->get_words(i) % divisor;
+                residual = this->get_words(i) / divisor;
+                this->set_word(upper * multiplier + lower, i - 1);
+                this->set_zeros_ahead(find_zeros_ahead(this->get_words(i - 1)), i - 1);
+            }
+
+            if (residual)
+            {
+                this->set_word(residual, len - 1);
+                this->set_zeros_ahead(find_zeros_ahead(residual), len - 1);
+            }
+            else
+            {
+                this->del_word(len - 1);
+                this->del_zeros_ahead(len - 1);
+            }
         }
     }
 }
@@ -189,7 +231,7 @@ static BigInteger shift_10r2p(const BigInteger &bi, int pow, unsigned base = 10)
 
 static BigInteger rem_10r2p(const BigInteger &bi, int pow, unsigned base = 10)
 {
-    BigInteger zero = ZERO;
+   BigInteger zero = ZERO;
     unsigned pow_abs = abs(pow);
     if (bi == zero) return zero;
     if (bi.get_digits() <= pow_abs) return bi;
@@ -346,7 +388,7 @@ static BigInteger multiply_karatsuba(const BigInteger &lhs, const BigInteger &rh
 static void fft(vector<complex_t> &X, bool invert = false)
 {
 	unsigned n = X.size();
-	Pair(n).tidy_that(X);
+    Pair(n).tidy_that(X);
 
     double _signed_2_pi_ = (invert ? -1 : 1) * 2 * acos(-1);
 	for (unsigned len = 2; len <= n; len <<= 1)

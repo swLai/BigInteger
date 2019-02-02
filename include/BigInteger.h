@@ -44,6 +44,13 @@ class BigInteger
                 this->zeros_ahead.push_back(zeros);
             }
         }
+        void ins_zeros_section(unsigned times) {
+            while (times--)
+            {
+                this->words.insert(this->words.begin(), 0);
+                this->zeros_ahead.insert(this->zeros_ahead.begin(), SECTION_LEN - 1);
+            }
+        }
         void set_sign(bool sign) {
             this->sign = sign;
         }

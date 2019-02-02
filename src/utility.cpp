@@ -1,4 +1,5 @@
 #include <string>
+#include <iostream>
 #include <sstream>
 #include <cmath>
 #include "../include/utility.h"
@@ -48,13 +49,66 @@ bool feagure_string_valid_check(string &s)
 
 unsigned find_zeros_ahead(unsigned word)
 {
-    string s;
-    stringstream ss;
-    ss << word;
-    ss >> s;
+    unsigned zeros_ahead = 0;
+    unsigned filter = BASE / 10;
 
-    unsigned len = s.length();
-    return abs(SECTION_LEN - len);
+    while ((filter^0x1) && word < filter)
+    {
+        ++zeros_ahead;
+        filter /= 10;
+    }
+    return zeros_ahead;
+}
+
+void generate_shifting_ele(unsigned pow, unsigned &multiplier, unsigned &divisor)
+{
+    switch (pow)
+    {
+        case 0:
+            multiplier = BASE;
+            divisor = 1;
+            return;
+        case 1:
+            multiplier = BASE / 10;
+            divisor = 10;
+            return;
+        case 2:
+            multiplier = BASE / 100;
+            divisor = 100;
+            return;
+        case 3:
+            multiplier = BASE / 1000;
+            divisor = 1000;
+            return;
+        case 4:
+            multiplier = BASE / 10000;
+            divisor = 10000;
+            return;
+        case 5:
+            multiplier = BASE / 100000;
+            divisor = 100000;
+            return;
+        case 6:
+            multiplier = BASE / 1000000;
+            divisor = 1000000;
+            return;
+        case 7:
+            multiplier = BASE / 10000000;
+            divisor = 10000000;
+            return;
+        case 8:
+            multiplier = BASE / 100000000;
+            divisor = 100000000;
+            return;
+        default:
+            divisor = 1;
+            while (pow--)
+            {
+                divisor *= 10;
+            }
+            multiplier = BASE / divisor;
+            return;
+    }
 }
 
 string generate_zeros_str(unsigned zeros)
