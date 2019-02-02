@@ -38,7 +38,7 @@ int main(void)
 
 That's it!
 
-See ./demo.cpp for more ideas about how to use the BigInteger class.
+See `./demo.cpp` for more ideas about how to use the BigInteger class.
 
 
 ## Performance
