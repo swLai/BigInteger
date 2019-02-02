@@ -3,7 +3,6 @@
 #include <vector>
 #include <complex>
 #include <cmath>
-#include <iomanip>
 
 #include "../include/BigInteger.h"
 #include "../include/define.h"
@@ -11,10 +10,10 @@
 #include "../include/pair.h"
 
 #ifndef ZERO
-    #define ZERO                    BigInteger(0)
+    #define ZERO                 BigInteger(0)
 #endif // ZERO
 #ifndef ONE
-    #define ONE                     BigInteger(1)
+    #define ONE                  BigInteger(1)
 #endif // ONE
 #ifndef MIN_ONE
     #define MIN_ONE              BigInteger(-1)
@@ -360,7 +359,7 @@ static BigInteger multiply_karatsuba(const BigInteger &lhs, const BigInteger &rh
 {
     BigInteger zero = ZERO;
 
-   unsigned n = max(lhs.get_digits(), rhs.get_digits());
+    unsigned n = max(lhs.get_digits(), rhs.get_digits());
 
     if (lhs == zero || rhs == zero)
         return zero;
@@ -387,7 +386,7 @@ static BigInteger multiply_karatsuba(const BigInteger &lhs, const BigInteger &rh
 #else
 static void fft(vector<complex_t> &X, bool invert = false)
 {
-	unsigned n = X.size();
+    unsigned n = X.size();
     Pair(n).tidy_that(X);
 
     double _signed_2_pi_ = (invert ? -1 : 1) * 2 * acos(-1);
@@ -448,7 +447,7 @@ static BigInteger multiply_fft(const BigInteger &lhs, const BigInteger &rhs)
 	while ( static_cast<unsigned long long>(R[R_len].real() + 0.5) == 0 && R_len > 0 ) --R_len;
 	++R_len;
 
-	BigInteger result;
+    BigInteger result;
     unsigned long long word_64 = 0;
     unsigned word, i = 0;
     do {
