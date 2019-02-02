@@ -49,8 +49,8 @@ The following picture demonstrates the performance of using the BigInteger class
   <img src="./img/demo.png" width="75%" height="75%" />	
 </p>
 
-Note: The results are obtained from ./demo.cpp
-
+Note 1: The results are obtained from ./demo.cpp
+Note 2: The FFT/KARATSUBA label below each panel is the indication of the "MULTIPLY" setting defined in .\include\define.h
 
 ## Author
 
