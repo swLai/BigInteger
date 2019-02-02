@@ -491,8 +491,9 @@ static BigInteger divide_iteration(const BigInteger &dividend, const BigInteger 
     unsigned divisor_leadings_len = divisor_words_len > 2 ? 3 : divisor_words_len > 1 ? 2 : 1;
 #endif // MULTIPLY
 
-    BigInteger rem_k(dividend), quo_k;
-    while (rem_k >= divisor)
+    BigInteger divisor_abs(abs(divisor));
+    BigInteger rem_k(abs(dividend)), quo_k;
+    while (rem_k >= divisor_abs)
     {
         unsigned rem_k_words_len = rem_k.get_words_len();
 #if MULTIPLY == KARATSUBA
@@ -633,7 +634,7 @@ BigInteger operator / (BigInteger lhs, const BigInteger &rhs)
     if (rhs == min_one) return -lhs;
 
     return BigInteger(
-        divide_iteration(abs(lhs), abs(rhs)),
+        divide_iteration(lhs, rhs),
         lhs.is_neg() ^ rhs.is_neg()
     );
 }
