@@ -371,12 +371,11 @@ static BigInteger multiply_karatsuba(const BigInteger &lhs, const BigInteger &rh
     }
     else
     {
-        BigInteger lhs_abs(abs(lhs)), rhs_abs(abs(rhs));
         BigInteger a0, a1, b0, b1;
         BigInteger r, p, q;
         unsigned m  = floor(n / 2);
-        a1 = shift_10r2p(lhs_abs, -m); a0 = rem_10r2p(lhs_abs, m);
-        b1 = shift_10r2p(rhs_abs, -m); b0 = rem_10r2p(rhs_abs, m);
+        a1 = shift_10r2p(lhs, -m); a0 = rem_10r2p(lhs, m);
+        b1 = shift_10r2p(rhs, -m); b0 = rem_10r2p(rhs, m);
         r = multiply_karatsuba(a1 + a0, b1 + b0);
         p = multiply_karatsuba(a1, b1);
         q = multiply_karatsuba(a0, b0);
@@ -492,9 +491,8 @@ static BigInteger divide_iteration(const BigInteger &dividend, const BigInteger 
     unsigned divisor_leadings_len = divisor_words_len > 2 ? 3 : divisor_words_len > 1 ? 2 : 1;
 #endif // MULTIPLY
 
-    BigInteger divisor_abs = abs(divisor);
-    BigInteger rem_k(abs(dividend)), quo_k;
-    while (rem_k >= divisor_abs)
+    BigInteger rem_k(dividend), quo_k;
+    while (rem_k >= divisor)
     {
         unsigned rem_k_words_len = rem_k.get_words_len();
 #if MULTIPLY == KARATSUBA
@@ -635,7 +633,7 @@ BigInteger operator / (BigInteger lhs, const BigInteger &rhs)
     if (rhs == min_one) return -lhs;
 
     return BigInteger(
-        divide_iteration(lhs, rhs),
+        divide_iteration(abs(lhs), abs(rhs)),
         lhs.is_neg() ^ rhs.is_neg()
     );
 }
