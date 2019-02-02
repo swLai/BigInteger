@@ -120,7 +120,7 @@ BigInteger::BigInteger(const BigInteger &bi, bool sign)
 
 BigInteger::BigInteger(const BigInteger &bi, int pow, unsigned base)
 {
-     BigInteger zero = ZERO;
+    BigInteger zero = ZERO;
 
     if (bi == zero || (static_cast<int>(bi.get_digits()) + pow) <= 0)
     {
@@ -260,11 +260,11 @@ static BigInteger add(const BigInteger &lhs, const BigInteger &rhs)
         }
         else
         {
-			while (carry && i < result_words)
-			{
-			    sub_result = result.get_words(i) + carry;
+            while (carry && i < result_words)
+            {
+                sub_result = result.get_words(i) + carry;
 
-				if (sub_result > SECTION_MAX)
+                if (sub_result > SECTION_MAX)
                 {
                     result.set_word(0, i);
                     result.set_zeros_ahead(SECTION_LEN-1, i);
@@ -405,7 +405,7 @@ static void fft(vector<complex_t> &X, bool invert = false)
 				X[ i + j ] += tmp;
 				w = w * wlen;
             }
-		}
+        }
     }
 
     if (invert)
