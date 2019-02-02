@@ -230,7 +230,7 @@ static BigInteger shift_10r2p(const BigInteger &bi, int pow, unsigned base = 10)
 
 static BigInteger rem_10r2p(const BigInteger &bi, int pow, unsigned base = 10)
 {
-   BigInteger zero = ZERO;
+    BigInteger zero = ZERO;
     unsigned pow_abs = abs(pow);
     if (bi == zero) return zero;
     if (bi.get_digits() <= pow_abs) return bi;
@@ -277,7 +277,7 @@ static BigInteger add(const BigInteger &lhs, const BigInteger &rhs)
                     result.set_zeros_ahead(find_zeros_ahead(sub_result), i);
                     return result;
                 }
-			}
+            }
         }
     }
 
