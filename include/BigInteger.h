@@ -64,11 +64,25 @@ public:
     {
         this->sign = sign;
     }
+    void del_word(unsigned pos)
+    {
+        if (pos < this->words.size())
+        {
+            this->words.erase(this->words.begin() + pos);
+        }
+    }
+    void del_zeros_ahead(unsigned pos)
+    {
+        if (pos < this->zeros_ahead.size())
+        {
+            this->zeros_ahead.erase(this->zeros_ahead.begin() + pos);
+        }
+    }
     bool is_neg(void) const
     {
         return this->sign;
     }
-    vector<unsigned> get_zeros_ahead(void ) const
+    vector<unsigned> get_zeros_ahead(void) const
     {
         return this->zeros_ahead;
     }
@@ -91,22 +105,8 @@ public:
     unsigned get_digits(void) const
     {
         unsigned words = this->words.size();
-        unsigned zeros_ahead = this->get_zeros_ahead(words-1);
+        unsigned zeros_ahead = this->zeros_ahead[words-1];
         return (words * SECTION_LEN - zeros_ahead);
-    }
-    void del_word(unsigned pos)
-    {
-        if (pos < this->words.size())
-        {
-            this->words.erase(this->words.begin() + pos);
-        }
-    }
-    void del_zeros_ahead(unsigned pos)
-    {
-        if (pos < this->zeros_ahead.size())
-        {
-            this->zeros_ahead.erase(this->zeros_ahead.begin() + pos);
-        }
     }
 
     // Array Operator
