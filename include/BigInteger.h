@@ -28,6 +28,10 @@ public:
     BigInteger(const BigInteger &, int, unsigned);
 
     // Element Operator
+    void set_sign(bool sign)
+    {
+        this->sign = sign;
+    }
     void set_word(unsigned word, unsigned pos)
     {
         if (pos < this->words.size())
@@ -52,18 +56,6 @@ public:
             this->zeros_ahead.push_back(zeros);
         }
     }
-    void ins_zeros_section(unsigned times)
-    {
-        while (times--)
-        {
-            this->words.insert(this->words.begin(), 0);
-            this->zeros_ahead.insert(this->zeros_ahead.begin(), SECTION_LEN - 1);
-        }
-    }
-    void set_sign(bool sign)
-    {
-        this->sign = sign;
-    }
     void del_word(unsigned pos)
     {
         if (pos < this->words.size())
@@ -76,6 +68,22 @@ public:
         if (pos < this->zeros_ahead.size())
         {
             this->zeros_ahead.erase(this->zeros_ahead.begin() + pos);
+        }
+    }
+    void ins_front_zeros_sections(unsigned times)
+    {
+        while (times--)
+        {
+            this->words.insert(this->words.begin(), 0);
+            this->zeros_ahead.insert(this->zeros_ahead.begin(), SECTION_LEN - 1);
+        }
+    }
+    void del_front_sections(unsigned times)
+    {
+        while (times--)
+        {
+            this->words.erase(this->words.begin());
+            this->zeros_ahead.erase(this->zeros_ahead.begin());
         }
     }
     bool is_neg(void) const

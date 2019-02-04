@@ -72,6 +72,14 @@ BigInteger::BigInteger(string init_str)
         return;
     }
 
+    // prevent -0 from getting into
+    int len = init_str.length();
+    if (len == 2 && (init_str[0] == '-' || init_str[0] == '+') && init_str[1] == '0')
+    {
+        *this = ZERO;
+        return;
+    }
+
     set_sign(false);
     switch (init_str[0])
     {
@@ -79,13 +87,13 @@ BigInteger::BigInteger(string init_str)
         set_sign(true);
     case '+':
         init_str.erase(0, 1); // erase the sign character
+        --len;
         break;
 
     default:
         ;
     }
 
-    int len = init_str.length();
     unsigned words = ceil(static_cast<double>(len) / SECTION_LEN);
     int shift = len;
     string feagures_str, feagure_sec;
@@ -160,17 +168,13 @@ BigInteger::BigInteger(const BigInteger &bi, int pow, unsigned base)
                 set_zeros_ahead(find_zeros_ahead(residual), len);
             }
 
-            ins_zeros_section(pow / SECTION_LEN);
+            ins_front_zeros_sections(pow / SECTION_LEN);
         }
         else
         {
             unsigned pow_abs = abs(pow);
             unsigned del_sections = pow_abs / SECTION_LEN;
-            while (del_sections--)
-            {
-                del_word(0);
-                del_zeros_ahead(0);
-            }
+            del_front_sections(del_sections);
 
             unsigned multiplier, divisor;
             generate_shifting_ele(pow_abs % SECTION_LEN, multiplier, divisor);
@@ -559,7 +563,12 @@ static BigInteger divide_iteration(const BigInteger &dividend, const BigInteger 
 
 BigInteger BigInteger::operator -() const
 {
-    return BigInteger(*this, !this->is_neg());
+    // prevent -0 from getting into
+    BigInteger zero = ZERO;
+    if (*this == zero)
+        return zero;
+    else
+        return BigInteger(*this, !this->is_neg());
 }
 
 BigInteger operator + (BigInteger lhs, const BigInteger &rhs)
@@ -575,7 +584,7 @@ BigInteger operator + (BigInteger lhs, const BigInteger &rhs)
     if (abs(lhs) == abs(rhs))
     {
         if (lhs.is_neg() != rhs.is_neg())
-            return ZERO;
+            return zero;
         else
             return BigInteger(add(lhs, rhs), lhs.is_neg());
     }
