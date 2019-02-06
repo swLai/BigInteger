@@ -5,7 +5,7 @@ using namespace std;
 
 bool validate_feagure_string(string &s)
 {
-    int len = s.length();
+    uint32_t len = s.length();
 
     if (len == 0)
         return false;
@@ -23,7 +23,7 @@ bool validate_feagure_string(string &s)
     {
     case '-':
     case '+':
-        for (int i = 1; i < len; i++)
+        for (uint32_t i = 1; i < len; i++)
         {
             char c = s[i] - '0';
             if (c > 9 || c < 0)
@@ -32,7 +32,7 @@ bool validate_feagure_string(string &s)
         break;
 
     default:
-        for (int i = 0; i < len; i++)
+        for (uint32_t i = 0; i < len; i++)
         {
             char c = s[i] - '0';
             if (c > 9 || c < 0)
@@ -43,10 +43,10 @@ bool validate_feagure_string(string &s)
     return true;
 }
 
-unsigned find_zeros_ahead(unsigned word)
+uint32_t find_zeros_ahead(uint32_t word)
 {
-    unsigned zeros_ahead = 0;
-    unsigned filter = BASE / 10;
+    uint32_t zeros_ahead = 0;
+    uint32_t filter = BASE / 10;
 
     while ((filter ^ 0x1) && word < filter)
     {
@@ -56,7 +56,7 @@ unsigned find_zeros_ahead(unsigned word)
     return zeros_ahead;
 }
 
-void generate_shifting_ele(unsigned pow, unsigned &multiplier, unsigned &divisor)
+void generate_shifting_ele(uint32_t pow, uint32_t &multiplier, uint32_t &divisor)
 {
     switch (pow)
     {
@@ -110,11 +110,11 @@ void generate_shifting_ele(unsigned pow, unsigned &multiplier, unsigned &divisor
     }
 }
 
-string generate_zeros_str(unsigned zeros)
+string generate_zeros_str(uint32_t zeros)
 {
     string zeros_str;
-    unsigned sections = zeros / SECTION_LEN;
-    unsigned zeros_remain = zeros % SECTION_LEN;
+    uint32_t sections = zeros / SECTION_LEN;
+    uint32_t zeros_remain = zeros % SECTION_LEN;
 
     while(sections--)
         zeros_str += SECTION_ZERO;
