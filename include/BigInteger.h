@@ -10,14 +10,14 @@ class BigInteger
 {
 private:
     bool sign;
-    vector<unsigned> words;
-    vector<unsigned> zeros_ahead;
+    vector<uint32_t> words;
+    vector<uint32_t> zeros_ahead;
 
 public:
     // no initializer
     BigInteger();
     // initialized by integer
-    BigInteger(long long);
+    BigInteger(int64_t);
     // initialized by feagure string
     BigInteger(string);
     // initialized by computational BIs
@@ -25,14 +25,14 @@ public:
     // initialized by other BI but self-decided sign
     BigInteger(const BigInteger &, bool);
     // for shifting
-    BigInteger(const BigInteger &, int, unsigned);
+    BigInteger(const BigInteger &, int32_t, uint32_t);
 
     // Element Operator
     void set_sign(bool sign)
     {
         this->sign = sign;
     }
-    void set_word(unsigned word, unsigned pos)
+    void set_word(uint32_t word, uint32_t pos)
     {
         if (pos < this->words.size())
         {
@@ -44,7 +44,7 @@ public:
             this->words.push_back(word);
         }
     }
-    void set_zeros_ahead(unsigned zeros, unsigned pos)
+    void set_zeros_ahead(uint32_t zeros, uint32_t pos)
     {
         if (pos < this->zeros_ahead.size())
         {
@@ -56,21 +56,21 @@ public:
             this->zeros_ahead.push_back(zeros);
         }
     }
-    void del_word(unsigned pos)
+    void del_word(uint32_t pos)
     {
         if (pos < this->words.size())
         {
             this->words.erase(this->words.begin() + pos);
         }
     }
-    void del_zeros_ahead(unsigned pos)
+    void del_zeros_ahead(uint32_t pos)
     {
         if (pos < this->zeros_ahead.size())
         {
             this->zeros_ahead.erase(this->zeros_ahead.begin() + pos);
         }
     }
-    void ins_front_zeros_sections(unsigned times)
+    void ins_front_zeros_sections(uint32_t times)
     {
         while (times--)
         {
@@ -78,7 +78,7 @@ public:
             this->zeros_ahead.insert(this->zeros_ahead.begin(), SECTION_LEN - 1);
         }
     }
-    void del_front_sections(unsigned times)
+    void del_front_sections(uint32_t times)
     {
         while (times--)
         {
@@ -90,35 +90,35 @@ public:
     {
         return this->sign;
     }
-    vector<unsigned> get_zeros_ahead(void) const
+    vector<uint32_t> get_zeros_ahead(void) const
     {
         return this->zeros_ahead;
     }
-    unsigned get_zeros_ahead(unsigned pos)  const
+    uint32_t get_zeros_ahead(uint32_t pos)  const
     {
         return this->zeros_ahead[pos];
     }
-    vector<unsigned> get_words(void) const
+    vector<uint32_t> get_words(void) const
     {
         return this->words;
     }
-    unsigned get_words(unsigned pos) const
+    uint32_t get_words(uint32_t pos) const
     {
         return this->words[pos];
     }
-    unsigned get_words_len(void) const
+    uint32_t get_words_len(void) const
     {
         return this->words.size();
     }
-    unsigned get_digits(void) const
+    uint32_t get_digits(void) const
     {
-        unsigned words = this->words.size();
-        unsigned zeros_ahead = this->zeros_ahead[words-1];
+        uint32_t words = this->words.size();
+        uint32_t zeros_ahead = this->zeros_ahead[words-1];
         return (words * SECTION_LEN - zeros_ahead);
     }
 
     // Array Operator
-    BigInteger& operator [] (unsigned n)
+    BigInteger& operator [] (uint32_t n)
     {
         return *(this + (n * sizeof(BigInteger)));
     }
@@ -131,35 +131,35 @@ public:
 
     // Assignment Operator
     BigInteger& operator = (const BigInteger &);
-    BigInteger& operator = (const long long &);
+    BigInteger& operator = (const int64_t &);
     BigInteger& operator += (const BigInteger &);
-    BigInteger& operator += (const long long &);
+    BigInteger& operator += (const int64_t &);
     BigInteger& operator -= (const BigInteger &);
-    BigInteger& operator -= (const long long &);
+    BigInteger& operator -= (const int64_t &);
     BigInteger& operator *= (const BigInteger &);
-    BigInteger& operator *= (const long long &);
+    BigInteger& operator *= (const int64_t &);
     BigInteger& operator /= (const BigInteger &);
-    BigInteger& operator /= (const long long &);
+    BigInteger& operator /= (const int64_t &);
     BigInteger& operator %= (const BigInteger &);
-    BigInteger& operator %= (const long long &);
+    BigInteger& operator %= (const int64_t &);
 
     // Arithmetic Operator (friend)
     BigInteger operator -() const;
     friend BigInteger operator + (BigInteger, const BigInteger &);
-    friend BigInteger operator + (BigInteger, const long long &);
-    friend BigInteger operator + (long long, const BigInteger &);
+    friend BigInteger operator + (BigInteger, const int64_t &);
+    friend BigInteger operator + (int64_t, const BigInteger &);
     friend BigInteger operator - (BigInteger,  const BigInteger &);
-    friend BigInteger operator - (BigInteger,  const long long &);
-    friend BigInteger operator - (long long,  const BigInteger &);
+    friend BigInteger operator - (BigInteger,  const int64_t &);
+    friend BigInteger operator - (int64_t,  const BigInteger &);
     friend BigInteger operator * (BigInteger, const BigInteger &);
-    friend BigInteger operator * (BigInteger, const long long &);
-    friend BigInteger operator * (long long, const BigInteger &);
+    friend BigInteger operator * (BigInteger, const int64_t &);
+    friend BigInteger operator * (int64_t, const BigInteger &);
     friend BigInteger operator / (BigInteger, const BigInteger &);
-    friend BigInteger operator / (BigInteger, const long long &);
-    friend BigInteger operator / (long long, const BigInteger &);
+    friend BigInteger operator / (BigInteger, const int64_t &);
+    friend BigInteger operator / (int64_t, const BigInteger &);
     friend BigInteger operator % (BigInteger, const BigInteger &);
-    friend BigInteger operator % (BigInteger, const long long &);
-    friend BigInteger operator % (long long, const BigInteger &);
+    friend BigInteger operator % (BigInteger, const int64_t &);
+    friend BigInteger operator % (int64_t, const BigInteger &);
 
     // Streaming Operator (friend)
     void print(ostream &) const;
@@ -173,40 +173,40 @@ ostream& operator << (ostream &, const BigInteger &);
 
 // Arithmetic Operator
 BigInteger operator + (BigInteger, const BigInteger &);
-BigInteger operator + (BigInteger, const long long &);
-BigInteger operator + (long long, const BigInteger &);
+BigInteger operator + (BigInteger, const int64_t &);
+BigInteger operator + (int64_t, const BigInteger &);
 BigInteger operator - (BigInteger, const BigInteger &);
-BigInteger operator - (BigInteger, const long long &);
-BigInteger operator - (long long, const BigInteger &);
+BigInteger operator - (BigInteger, const int64_t &);
+BigInteger operator - (int64_t, const BigInteger &);
 BigInteger operator * (BigInteger, const BigInteger &);
-BigInteger operator * (BigInteger, const long long &);
-BigInteger operator * (long long, const BigInteger &);
+BigInteger operator * (BigInteger, const int64_t &);
+BigInteger operator * (int64_t, const BigInteger &);
 BigInteger operator / (BigInteger, const BigInteger &);
-BigInteger operator / (BigInteger, const long long &);
-BigInteger operator / (long long, const BigInteger &);
+BigInteger operator / (BigInteger, const int64_t &);
+BigInteger operator / (int64_t, const BigInteger &);
 BigInteger operator % (BigInteger, const BigInteger &);
-BigInteger operator % (BigInteger, const long long &);
-BigInteger operator % (long long, const BigInteger &);
+BigInteger operator % (BigInteger, const int64_t &);
+BigInteger operator % (int64_t, const BigInteger &);
 
 // Comparison Operator
 bool operator == (const BigInteger &, const BigInteger &);
-bool operator == (const BigInteger &, const long long &);
-bool operator == (const long long &, const BigInteger &);
+bool operator == (const BigInteger &, const int64_t &);
+bool operator == (const int64_t &, const BigInteger &);
 bool operator != (const BigInteger &, const BigInteger &);
-bool operator != (const BigInteger &, const long long &);
-bool operator != (const long long &, const BigInteger &);
+bool operator != (const BigInteger &, const int64_t &);
+bool operator != (const int64_t &, const BigInteger &);
 bool operator > (const BigInteger &, const BigInteger &);
-bool operator > (const BigInteger &, const long long &);
-bool operator > (const long long &, const BigInteger &);
+bool operator > (const BigInteger &, const int64_t &);
+bool operator > (const int64_t &, const BigInteger &);
 bool operator < (const BigInteger &, const BigInteger &);
-bool operator < (const BigInteger &, const long long &);
-bool operator < (const long long &, const BigInteger &);
+bool operator < (const BigInteger &, const int64_t &);
+bool operator < (const int64_t &, const BigInteger &);
 bool operator >= (const BigInteger &, const BigInteger &);
-bool operator >= (const BigInteger &, const long long &);
-bool operator >= (const long long &, const BigInteger &);
+bool operator >= (const BigInteger &, const int64_t &);
+bool operator >= (const int64_t &, const BigInteger &);
 bool operator <= (const BigInteger &, const BigInteger &);
-bool operator <= (const BigInteger &, const long long &);
-bool operator <= (const long long &, const BigInteger &);
+bool operator <= (const BigInteger &, const int64_t &);
+bool operator <= (const int64_t &, const BigInteger &);
 
 // Math Functions
 BigInteger abs(const BigInteger &);
