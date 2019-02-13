@@ -18,11 +18,8 @@ static const BigInteger MIN_ONE(-1);
     Constructor
 */
 BigInteger::BigInteger()
+: sign{false}, words{0}, zeros_ahead{SECTION_LEN-1}
 {
-    // Initialize with 0
-    set_word(0, 0);
-    set_zeros_ahead(SECTION_LEN-1, 0);
-    set_sign(false);
 }
 
 BigInteger::BigInteger(int64_t word)
@@ -104,6 +101,11 @@ BigInteger::BigInteger(string init_str)
         set_zeros_ahead(find_zeros_ahead(word), pos);
         ++pos;
     }
+}
+
+BigInteger::BigInteger(const char *init_str)
+{
+    *this = string(init_str);
 }
 
 BigInteger::BigInteger(const BigInteger &bi)
@@ -212,7 +214,7 @@ istream& operator >> (istream &in, BigInteger &bi)
 {
     string init_str;
     in >> init_str;
-    bi = BigInteger(init_str);
+    bi = init_str;
     return in;
 }
 
@@ -552,7 +554,7 @@ BigInteger BigInteger::operator -() const
         return BigInteger(*this, !this->is_neg());
 }
 
-BigInteger operator + (BigInteger lhs, const BigInteger &rhs)
+BigInteger operator + (const BigInteger &lhs, const BigInteger &rhs)
 {
     if (lhs == ::ZERO)
         return rhs;
@@ -583,32 +585,12 @@ BigInteger operator + (BigInteger lhs, const BigInteger &rhs)
     }
 }
 
-BigInteger operator + (BigInteger bi, const int64_t &x)
-{
-    return bi + BigInteger(x);
-}
-
-BigInteger operator + (int64_t x, const BigInteger &bi)
-{
-    return bi + BigInteger(x);
-}
-
-BigInteger operator - (BigInteger lhs, const BigInteger &rhs)
+BigInteger operator - (const BigInteger &lhs, const BigInteger &rhs)
 {
     return lhs + (-rhs);
 }
 
-BigInteger operator - (BigInteger bi,  const int64_t &x)
-{
-    return bi - BigInteger(x);
-}
-
-BigInteger operator - (int64_t x,  const BigInteger &bi)
-{
-    return BigInteger(x) - bi;
-}
-
-BigInteger operator * (BigInteger lhs, const BigInteger &rhs)
+BigInteger operator * (const BigInteger &lhs, const BigInteger &rhs)
 {
     if (lhs == ::ZERO || rhs == ::ZERO)
         return ::ZERO;
@@ -635,17 +617,7 @@ BigInteger operator * (BigInteger lhs, const BigInteger &rhs)
     );
 }
 
-BigInteger operator * (BigInteger bi,  const int64_t &x)
-{
-    return bi * BigInteger(x);
-}
-
-BigInteger operator * (int64_t x,  const BigInteger &bi)
-{
-    return bi * BigInteger(x);
-}
-
-BigInteger operator / (BigInteger lhs, const BigInteger &rhs)
+BigInteger operator / (const BigInteger &lhs, const BigInteger &rhs)
 {
     if (lhs < rhs)
         return ::ZERO;
@@ -673,29 +645,9 @@ BigInteger operator / (BigInteger lhs, const BigInteger &rhs)
     );
 }
 
-BigInteger operator / (BigInteger bi,  const int64_t &x)
-{
-    return bi / BigInteger(x);
-}
-
-BigInteger operator / (int64_t x,  const BigInteger &bi)
-{
-    return BigInteger(x) / bi;
-}
-
-BigInteger operator % (BigInteger lhs, const BigInteger &rhs)
+BigInteger operator % (const BigInteger &lhs, const BigInteger &rhs)
 {
     return lhs - (lhs / rhs) * rhs;
-}
-
-BigInteger operator % (BigInteger bi,  const int64_t &x)
-{
-    return bi % BigInteger(x);
-}
-
-BigInteger operator % (int64_t x,  const BigInteger &bi)
-{
-    return BigInteger(x) % bi;
 }
 
 /*
@@ -738,21 +690,9 @@ BigInteger& BigInteger::operator = (const BigInteger &rhs)
     return *this;
 }
 
-BigInteger& BigInteger::operator = (const int64_t &x)
-{
-    *this = BigInteger(x);
-    return *this;
-}
-
 BigInteger& BigInteger::operator += (const BigInteger &rhs)
 {
     *this = *this + rhs;
-    return *this;
-}
-
-BigInteger& BigInteger::operator += (const int64_t &x)
-{
-    *this = *this + BigInteger(x);
     return *this;
 }
 
@@ -762,21 +702,9 @@ BigInteger& BigInteger::operator -= (const BigInteger &rhs)
     return *this;
 }
 
-BigInteger& BigInteger::operator -= (const int64_t &x)
-{
-    *this = *this - BigInteger(x);
-    return *this;
-}
-
 BigInteger& BigInteger::operator *= (const BigInteger &rhs)
 {
     *this = *this * rhs;
-    return *this;
-}
-
-BigInteger& BigInteger::operator *= (const int64_t &x)
-{
-    *this = *this * BigInteger(x);
     return *this;
 }
 
@@ -786,21 +714,9 @@ BigInteger& BigInteger::operator /= (const BigInteger &rhs)
     return *this;
 }
 
-BigInteger& BigInteger::operator /= (const int64_t &x)
-{
-    *this = *this / BigInteger(x);
-    return *this;
-}
-
 BigInteger& BigInteger::operator %= (const BigInteger &rhs)
 {
     *this = *this % rhs;
-    return *this;
-}
-
-BigInteger& BigInteger::operator %= (const int64_t &x)
-{
-    *this = *this % BigInteger(x);
     return *this;
 }
 
@@ -828,44 +744,8 @@ bool operator == (const BigInteger &lhs, const BigInteger &rhs)
         return false;
 }
 
-bool operator == (const BigInteger &lhs, const int64_t &x)
-{
-    BigInteger rhs(x);
-    if (lhs == rhs)
-        return true;
-    else
-        return false;
-}
-
-bool operator == (const int64_t &x, const BigInteger &rhs)
-{
-    BigInteger lhs(x);
-    if (lhs == rhs)
-        return true;
-    else
-        return false;
-}
-
 bool operator != (const BigInteger &lhs, const BigInteger &rhs)
 {
-    if (lhs == rhs)
-        return false;
-    else
-        return true;
-}
-
-bool operator != (const BigInteger &lhs, const int64_t &x)
-{
-    BigInteger rhs(x);
-    if (lhs == rhs)
-        return false;
-    else
-        return true;
-}
-
-bool operator != (const int64_t &x, const BigInteger &rhs)
-{
-    BigInteger lhs(x);
     if (lhs == rhs)
         return false;
     else
@@ -905,44 +785,8 @@ bool operator > (const BigInteger &lhs, const BigInteger &rhs)
     return false;
 }
 
-bool operator > (const BigInteger &lhs, const int64_t &x)
-{
-    BigInteger rhs(x);
-    if (lhs > rhs)
-        return true;
-    else
-        return false;
-}
-
-bool operator > (const int64_t &x, const BigInteger &rhs)
-{
-    BigInteger lhs(x);
-    if (lhs > rhs)
-        return true;
-    else
-        return false;
-}
-
 bool operator <= (const BigInteger &lhs, const BigInteger &rhs)
 {
-    if (lhs > rhs)
-        return false;
-    else
-        return true;
-}
-
-bool operator <= (const BigInteger &lhs, const int64_t &x)
-{
-    BigInteger rhs(x);
-    if (lhs > rhs)
-        return false;
-    else
-        return true;
-}
-
-bool operator <= (const int64_t &x, const BigInteger &rhs)
-{
-    BigInteger lhs(x);
     if (lhs > rhs)
         return false;
     else
@@ -957,44 +801,8 @@ bool operator >= (const BigInteger &lhs, const BigInteger &rhs)
         return false;
 }
 
-bool operator >= (const BigInteger &lhs, const int64_t &x)
-{
-    BigInteger rhs(x);
-    if (lhs == rhs || lhs > rhs)
-        return true;
-    else
-        return false;
-}
-
-bool operator >= (const int64_t &x, const BigInteger &rhs)
-{
-    BigInteger lhs(x);
-    if (lhs == rhs || lhs > rhs)
-        return true;
-    else
-        return false;
-}
-
 bool operator < (const BigInteger &lhs, const BigInteger &rhs)
 {
-    if (lhs >= rhs)
-        return false;
-    else
-        return true;
-}
-
-bool operator < (const BigInteger &lhs, const int64_t &x)
-{
-    BigInteger rhs(x);
-    if (lhs >= rhs)
-        return false;
-    else
-        return true;
-}
-
-bool operator < (const int64_t &x, const BigInteger &rhs)
-{
-    BigInteger lhs(x);
     if (lhs >= rhs)
         return false;
     else

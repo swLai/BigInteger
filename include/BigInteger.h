@@ -20,6 +20,7 @@ public:
     BigInteger(int64_t);
     // initialized by feagure string
     BigInteger(string);
+    BigInteger(const char *);
     // initialized by computational BIs
     BigInteger(const BigInteger &);
     // initialized by other BI but self-decided sign
@@ -130,36 +131,20 @@ public:
     BigInteger  operator --(int); // postfix
 
     // Assignment Operator
-    BigInteger& operator = (const BigInteger &);
-    BigInteger& operator = (const int64_t &);
+    BigInteger& operator  = (const BigInteger &);
     BigInteger& operator += (const BigInteger &);
-    BigInteger& operator += (const int64_t &);
     BigInteger& operator -= (const BigInteger &);
-    BigInteger& operator -= (const int64_t &);
     BigInteger& operator *= (const BigInteger &);
-    BigInteger& operator *= (const int64_t &);
     BigInteger& operator /= (const BigInteger &);
-    BigInteger& operator /= (const int64_t &);
     BigInteger& operator %= (const BigInteger &);
-    BigInteger& operator %= (const int64_t &);
 
     // Arithmetic Operator (friend)
     BigInteger operator -() const;
-    friend BigInteger operator + (BigInteger, const BigInteger &);
-    friend BigInteger operator + (BigInteger, const int64_t &);
-    friend BigInteger operator + (int64_t, const BigInteger &);
-    friend BigInteger operator - (BigInteger,  const BigInteger &);
-    friend BigInteger operator - (BigInteger,  const int64_t &);
-    friend BigInteger operator - (int64_t,  const BigInteger &);
-    friend BigInteger operator * (BigInteger, const BigInteger &);
-    friend BigInteger operator * (BigInteger, const int64_t &);
-    friend BigInteger operator * (int64_t, const BigInteger &);
-    friend BigInteger operator / (BigInteger, const BigInteger &);
-    friend BigInteger operator / (BigInteger, const int64_t &);
-    friend BigInteger operator / (int64_t, const BigInteger &);
-    friend BigInteger operator % (BigInteger, const BigInteger &);
-    friend BigInteger operator % (BigInteger, const int64_t &);
-    friend BigInteger operator % (int64_t, const BigInteger &);
+    friend BigInteger operator + (const BigInteger &, const BigInteger &);
+    friend BigInteger operator - (const BigInteger &,  const BigInteger &);
+    friend BigInteger operator * (const BigInteger &, const BigInteger &);
+    friend BigInteger operator / (const BigInteger &, const BigInteger &);
+    friend BigInteger operator % (const BigInteger &, const BigInteger &);
 
     // Streaming Operator (friend)
     void print(ostream &) const;
@@ -172,41 +157,19 @@ istream& operator >> (istream &, BigInteger &);
 ostream& operator << (ostream &, const BigInteger &);
 
 // Arithmetic Operator
-BigInteger operator + (BigInteger, const BigInteger &);
-BigInteger operator + (BigInteger, const int64_t &);
-BigInteger operator + (int64_t, const BigInteger &);
-BigInteger operator - (BigInteger, const BigInteger &);
-BigInteger operator - (BigInteger, const int64_t &);
-BigInteger operator - (int64_t, const BigInteger &);
-BigInteger operator * (BigInteger, const BigInteger &);
-BigInteger operator * (BigInteger, const int64_t &);
-BigInteger operator * (int64_t, const BigInteger &);
-BigInteger operator / (BigInteger, const BigInteger &);
-BigInteger operator / (BigInteger, const int64_t &);
-BigInteger operator / (int64_t, const BigInteger &);
-BigInteger operator % (BigInteger, const BigInteger &);
-BigInteger operator % (BigInteger, const int64_t &);
-BigInteger operator % (int64_t, const BigInteger &);
+BigInteger operator + (const BigInteger &, const BigInteger &);
+BigInteger operator - (const BigInteger &, const BigInteger &);
+BigInteger operator * (const BigInteger &, const BigInteger &);
+BigInteger operator / (const BigInteger &, const BigInteger &);
+BigInteger operator % (const BigInteger &, const BigInteger &);
 
 // Comparison Operator
 bool operator == (const BigInteger &, const BigInteger &);
-bool operator == (const BigInteger &, const int64_t &);
-bool operator == (const int64_t &, const BigInteger &);
 bool operator != (const BigInteger &, const BigInteger &);
-bool operator != (const BigInteger &, const int64_t &);
-bool operator != (const int64_t &, const BigInteger &);
 bool operator > (const BigInteger &, const BigInteger &);
-bool operator > (const BigInteger &, const int64_t &);
-bool operator > (const int64_t &, const BigInteger &);
 bool operator < (const BigInteger &, const BigInteger &);
-bool operator < (const BigInteger &, const int64_t &);
-bool operator < (const int64_t &, const BigInteger &);
 bool operator >= (const BigInteger &, const BigInteger &);
-bool operator >= (const BigInteger &, const int64_t &);
-bool operator >= (const int64_t &, const BigInteger &);
 bool operator <= (const BigInteger &, const BigInteger &);
-bool operator <= (const BigInteger &, const int64_t &);
-bool operator <= (const int64_t &, const BigInteger &);
 
 // Math Functions
 BigInteger abs(const BigInteger &);
