@@ -17,11 +17,6 @@ static const BigInteger MIN_ONE(-1);
 /*
     Constructor
 */
-BigInteger::BigInteger()
-: sign{false}, words{0}, zeros_ahead{SECTION_LEN-1}
-{
-}
-
 BigInteger::BigInteger(int64_t word)
 {
     if (word)
@@ -47,7 +42,7 @@ BigInteger::BigInteger(int64_t word)
     }
 }
 
-BigInteger::BigInteger(string init_str)
+BigInteger::BigInteger(const string &init_str)
 {
     if ( !validate_feagure_string(init_str) )
     {
@@ -65,27 +60,27 @@ BigInteger::BigInteger(string init_str)
     }
 
     set_sign(false);
+    bool sign_flag = false;
     switch (init_str[0])
     {
     case '-':
         set_sign(true);
     case '+':
-        init_str.erase(0, 1); // erase the sign character
-        --len;
+        sign_flag = true;
         break;
 
     default:
         ;
     }
 
-    uint32_t words = ceil(static_cast<double>(len) / SECTION_LEN);
+    uint32_t words = ceil(static_cast<double>(len-sign_flag) / SECTION_LEN);
     int32_t shift = len;
     string feagures_str, feagure_sec;
     for (uint32_t i = 0; i < words; ++i)
     {
         shift -= SECTION_LEN;
-        if (shift < 0)
-            feagure_sec = init_str.substr(0, shift + SECTION_LEN);
+        if (shift < sign_flag)
+            feagure_sec = init_str.substr(sign_flag, shift + SECTION_LEN - sign_flag);
         else
             feagure_sec = init_str.substr(shift, SECTION_LEN);
         feagures_str += ' ' + feagure_sec;
@@ -101,16 +96,6 @@ BigInteger::BigInteger(string init_str)
         set_zeros_ahead(find_zeros_ahead(word), pos);
         ++pos;
     }
-}
-
-BigInteger::BigInteger(const char *init_str)
-{
-    *this = string(init_str);
-}
-
-BigInteger::BigInteger(const BigInteger &bi)
-{
-    *this = bi;
 }
 
 BigInteger::BigInteger(const BigInteger &bi, bool sign)
@@ -562,14 +547,16 @@ BigInteger operator + (const BigInteger &lhs, const BigInteger &rhs)
     if (rhs == ::ZERO)
         return lhs;
 
-    if (abs(lhs) == abs(rhs))
+    BigInteger lhs_abs{abs(lhs)}, rhs_abs{abs(rhs)};
+
+    if (lhs_abs == rhs_abs)
     {
         if (lhs.is_neg() != rhs.is_neg())
             return ::ZERO;
         else
             return BigInteger(add(lhs, rhs), lhs.is_neg());
     }
-    else if (abs(lhs) > abs(rhs))
+    else if (lhs_abs > rhs_abs)
     {
         if (lhs.is_neg() == rhs.is_neg())
             return BigInteger(add(lhs, rhs), lhs.is_neg());
@@ -682,14 +669,6 @@ BigInteger BigInteger::operator --(int)
 /*
     Assignment Operator
 */
-BigInteger& BigInteger::operator = (const BigInteger &rhs)
-{
-    this->words = rhs.get_words();
-    this->zeros_ahead = rhs.get_zeros_ahead();
-    this->sign = rhs.is_neg();
-    return *this;
-}
-
 BigInteger& BigInteger::operator += (const BigInteger &rhs)
 {
     *this = *this + rhs;

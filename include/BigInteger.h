@@ -9,20 +9,17 @@ using namespace std;
 class BigInteger
 {
 private:
-    bool sign;
-    vector<uint32_t> words;
-    vector<uint32_t> zeros_ahead;
+    bool sign{false};
+    vector<uint32_t> words{0};
+    vector<uint32_t> zeros_ahead{SECTION_LEN-1};
 
 public:
     // no initializer
-    BigInteger();
+    BigInteger() = default;
     // initialized by integer
     BigInteger(int64_t);
     // initialized by feagure string
-    BigInteger(string);
-    BigInteger(const char *);
-    // initialized by computational BIs
-    BigInteger(const BigInteger &);
+    BigInteger(const string &);
     // initialized by other BI but self-decided sign
     BigInteger(const BigInteger &, bool);
     // for shifting
@@ -131,7 +128,6 @@ public:
     BigInteger  operator --(int); // postfix
 
     // Assignment Operator
-    BigInteger& operator  = (const BigInteger &);
     BigInteger& operator += (const BigInteger &);
     BigInteger& operator -= (const BigInteger &);
     BigInteger& operator *= (const BigInteger &);

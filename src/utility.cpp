@@ -3,7 +3,7 @@
 
 using namespace std;
 
-bool validate_feagure_string(string &s)
+bool validate_feagure_string(const string &s)
 {
     uint32_t len = s.length();
 
