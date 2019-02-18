@@ -491,8 +491,8 @@ static BigInteger divide_iteration(const BigInteger &dividend, const BigInteger 
     uint32_t divisor_leadings_len = divisor_words_len > 2 ? 3 : divisor_words_len > 1 ? 2 : 1;
 #endif // MULTIPLY
 
-    BigInteger divisor_abs(abs(divisor));
-    BigInteger rem(abs(dividend)), quo;
+    BigInteger divisor_abs{abs(divisor)};
+    BigInteger rem{abs(dividend)}, quo;
     while (rem >= divisor_abs)
     {
         uint32_t rem_words_len = rem.get_words_len();
@@ -522,8 +522,8 @@ static BigInteger divide_iteration(const BigInteger &dividend, const BigInteger 
             --words_len_diff;
         }
 
-        BigInteger dummy = BigInteger(static_cast<uint64_t>(head));
-        rem -= shift_10r2p(divisor * dummy, words_len_diff * SECTION_LEN);
+        BigInteger dummy = static_cast<int64_t>(head);
+        rem -= shift_10r2p(divisor_abs * dummy, words_len_diff * SECTION_LEN);
         quo += shift_10r2p(dummy, words_len_diff * SECTION_LEN);
     }
 
