@@ -522,7 +522,7 @@ static BigInteger divide_iteration(const BigInteger &dividend, const BigInteger 
             --words_len_diff;
         }
 
-        BigInteger dummy = static_cast<int64_t>(head);
+        BigInteger dummy {static_cast<int64_t>(head)};
         rem -= shift_10r2p(divisor_abs * dummy, words_len_diff * SECTION_LEN);
         quo += shift_10r2p(dummy, words_len_diff * SECTION_LEN);
     }
