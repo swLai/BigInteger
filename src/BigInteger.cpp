@@ -106,7 +106,7 @@ BigInteger::BigInteger(const BigInteger &bi, bool sign)
 
 BigInteger::BigInteger(const BigInteger &bi, int32_t pow, uint32_t base)
 {
-    if ( bi == ::ZERO || (static_cast<int>(bi.get_digits()) + pow) <= 0 )
+    if ( bi == ::ZERO || (static_cast<int32_t>(bi.get_digits()) + pow) <= 0 )
     {
         *this = ::ZERO;
         return;
@@ -123,7 +123,7 @@ BigInteger::BigInteger(const BigInteger &bi, int32_t pow, uint32_t base)
             uint32_t multiplier, divisor;
             generate_shifting_ele(pow % SECTION_LEN, multiplier, divisor);
 
-            uint32_t len = this->get_words_len();
+            uint32_t len = get_words_len();
             uint32_t upper, lower, residual = 0;
             for (uint32_t i = 0; i < len; ++i)
             {
