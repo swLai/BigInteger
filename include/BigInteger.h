@@ -20,6 +20,8 @@ public:
     BigInteger(int64_t);
     // initialized by figure string
     BigInteger(const string &);
+    // initialized by C-style figure string
+    BigInteger(const char *);
     // copy form other BI obj but self-decided sign
     BigInteger(const BigInteger &, bool);
     // for shifting

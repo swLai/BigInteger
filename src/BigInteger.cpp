@@ -42,9 +42,9 @@ BigInteger::BigInteger(int64_t word)
     }
 }
 
-BigInteger::BigInteger(const string &init_str)
+BigInteger::BigInteger(const string &figure_str)
 {
-    if ( !validate_figure_string(init_str) )
+    if ( !validate_figure_string(figure_str) )
     {
         cout << "The value is not a complete integer number!\n" << endl;
         *this = ::ZERO;
@@ -52,8 +52,8 @@ BigInteger::BigInteger(const string &init_str)
     }
 
     // prevent -0 from getting into
-    int32_t len = init_str.length();
-    if (len == 2 && (init_str[0] == '-' || init_str[0] == '+') && init_str[1] == '0')
+    int32_t len = figure_str.length();
+    if (len == 2 && (figure_str[0] == '-' || figure_str[0] == '+') && figure_str[1] == '0')
     {
         *this = ::ZERO;
         return;
@@ -61,7 +61,7 @@ BigInteger::BigInteger(const string &init_str)
 
     set_sign(false);
     bool sign_flag = false;
-    switch (init_str[0])
+    switch (figure_str[0])
     {
     case '-':
         set_sign(true);
@@ -80,9 +80,9 @@ BigInteger::BigInteger(const string &init_str)
     {
         shift -= SECTION_LEN;
         if (shift < sign_flag)
-            figure_sec = init_str.substr(sign_flag, shift + SECTION_LEN - sign_flag);
+            figure_sec = figure_str.substr(sign_flag, shift + SECTION_LEN - sign_flag);
         else
-            figure_sec = init_str.substr(shift, SECTION_LEN);
+            figure_sec = figure_str.substr(shift, SECTION_LEN);
         figures_str += ' ' + figure_sec;
     }
 
@@ -96,6 +96,11 @@ BigInteger::BigInteger(const string &init_str)
         set_zeros_ahead(find_zeros_ahead(word), pos);
         ++pos;
     }
+}
+
+BigInteger::BigInteger(const char *figure_str)
+{
+    *this = string(figure_str);
 }
 
 BigInteger::BigInteger(const BigInteger &bi, bool sign)
