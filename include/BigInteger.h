@@ -14,13 +14,13 @@ private:
     vector<uint32_t> zeros_ahead{SECTION_LEN-1};
 
 public:
-    // no initializer
+    // default constructor
     BigInteger() = default;
     // initialized by integer
     BigInteger(int64_t);
-    // initialized by feagure string
+    // initialized by figure string
     BigInteger(const string &);
-    // initialized by other BI but self-decided sign
+    // copy form other BI obj but self-decided sign
     BigInteger(const BigInteger &, bool);
     // for shifting
     BigInteger(const BigInteger &, int32_t, uint32_t);
@@ -137,7 +137,7 @@ public:
     // Arithmetic Operator (friend)
     BigInteger operator -() const;
     friend BigInteger operator + (const BigInteger &, const BigInteger &);
-    friend BigInteger operator - (const BigInteger &,  const BigInteger &);
+    friend BigInteger operator - (const BigInteger &, const BigInteger &);
     friend BigInteger operator * (const BigInteger &, const BigInteger &);
     friend BigInteger operator / (const BigInteger &, const BigInteger &);
     friend BigInteger operator % (const BigInteger &, const BigInteger &);

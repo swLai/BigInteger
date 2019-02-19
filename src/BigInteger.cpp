@@ -44,7 +44,7 @@ BigInteger::BigInteger(int64_t word)
 
 BigInteger::BigInteger(const string &init_str)
 {
-    if ( !validate_feagure_string(init_str) )
+    if ( !validate_figure_string(init_str) )
     {
         cout << "The value is not a complete integer number!\n" << endl;
         *this = ::ZERO;
@@ -75,21 +75,21 @@ BigInteger::BigInteger(const string &init_str)
 
     uint32_t words = ceil(static_cast<double>(len-sign_flag) / SECTION_LEN);
     int32_t shift = len;
-    string feagures_str, feagure_sec;
+    string figures_str, figure_sec;
     for (uint32_t i = 0; i < words; ++i)
     {
         shift -= SECTION_LEN;
         if (shift < sign_flag)
-            feagure_sec = init_str.substr(sign_flag, shift + SECTION_LEN - sign_flag);
+            figure_sec = init_str.substr(sign_flag, shift + SECTION_LEN - sign_flag);
         else
-            feagure_sec = init_str.substr(shift, SECTION_LEN);
-        feagures_str += ' ' + feagure_sec;
+            figure_sec = init_str.substr(shift, SECTION_LEN);
+        figures_str += ' ' + figure_sec;
     }
 
     stringstream ss;
     uint32_t word;
     uint32_t pos = 0;
-    ss << feagures_str;
+    ss << figures_str;
     while (ss >> word)
     {
         set_word(word, pos);
