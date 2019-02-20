@@ -58,33 +58,21 @@ public:
     }
     void del_word(uint32_t pos)
     {
-        if (pos < this->words.size())
-        {
-            this->words.erase(this->words.begin() + pos);
-        }
+        this->words.erase(this->words.begin() + pos);
     }
     void del_zeros_ahead(uint32_t pos)
     {
-        if (pos < this->zeros_ahead.size())
-        {
-            this->zeros_ahead.erase(this->zeros_ahead.begin() + pos);
-        }
+        this->zeros_ahead.erase(this->zeros_ahead.begin() + pos);
     }
     void ins_front_zeros_sections(uint32_t times)
     {
-        while (times--)
-        {
-            this->words.insert(this->words.begin(), 0);
-            this->zeros_ahead.insert(this->zeros_ahead.begin(), SECTION_LEN - 1);
-        }
+        this->words.insert(this->words.begin(), times, 0);
+        this->zeros_ahead.insert(this->zeros_ahead.begin(), times, SECTION_LEN - 1);
     }
     void del_front_sections(uint32_t times)
     {
-        while (times--)
-        {
-            this->words.erase(this->words.begin());
-            this->zeros_ahead.erase(this->zeros_ahead.begin());
-        }
+        this->words.erase(this->words.begin(), this->words.begin() + times);
+        this->zeros_ahead.erase(this->zeros_ahead.begin(), this->words.begin() + times);
     }
     bool is_neg(void) const
     {
